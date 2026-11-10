@@ -21,7 +21,7 @@ function createFS(){
 }
 function resolve(fs,path){let n=fs["/"];if(path==="/")return n;for(const p of path.split("/").filter(Boolean)){if(!n||n.type!=="dir")return null;n=n.children[p]}return n||null}
 function createSession(options={}){const fs=options.fs||createFS(),history=[],environment=Object.assign({USER:"guest",HOME:"/home/guest",PWD:"/home/guest",SHELL:"/bin/cairn",TERM:"sand-256color"},options.environment||{}),aliases=new Map(),registry=new Map(),jobs=new Map();let cwd="/home/guest",nextJob=1,lastExit=0,lastOutput="";
-const result=(stdout="",exitCode=0,extra={})=>Object.assign({stdout:String(stdout),exitCode,lines:String(stdout).split("\n").map(text=>({text,kind:exitCode?"error":"normal"}))},extra),target=p=>normalizePath(cwd,p),node=p=>resolve(fs,target(p));
+const result=(stdout="",exitCode=0,extra={})=>{const value=String(stdout);return Object.assign({stdout:value,exitCode,lines:value===""?[]:value.split("\n").map(text=>({text,kind:exitCode?"error":"normal"}))},extra)},target=p=>normalizePath(cwd,p),node=p=>resolve(fs,target(p));
 const expand=v=>v.replace(/~(?=\/|$)/g,environment.HOME||"/home/guest").replace(/\$\{([A-Za-z_][A-Za-z0-9_]*)\}|\$([A-Za-z_][A-Za-z0-9_]*)/g,(_,a,b)=>environment[a||b]??"");
 function registerCommand(name,handler,description="Extension command"){if(!/^[a-z][a-z0-9_-]*$/.test(name)||typeof handler!=="function")throw new TypeError("Invalid command registration.");registry.set(name,{handler,description});return true}
 function registerAlias(name,command){if(!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(name)||!String(command).trim())throw new TypeError("Invalid alias.");aliases.set(name,String(command));return true}
@@ -55,26 +55,20 @@ function run(line,context={}){
  for(const group of groups){
   if(previousOperator==="&&"&&exitCode!==0){previousOperator=group.operator;continue}
   if(previousOperator==="||"&&exitCode===0){previousOperator=group.operator;continue}
-  let prior=0,pipeOut="",finalResult=result("");
-  for(const stage of group.chain){
-   for(const argv of stage.pipeline){
-    if(!argv.length)continue;
-    const r=invoke(argv,pipeOut,Object.assign({},context,{raw:argv.join(" ")}));
-    if(r.clear){cleared=true;all=[]}
-    pipeOut=r.stdout??"";
-    prior=r.exitCode??0;
-    finalResult=r;
-   }
-  }
-  exitCode=prior;
-  if(!cleared||pipeOut!==""){
-   if(finalResult.lines?.length)all.push(...finalResult.lines);
-   else if(pipeOut!=="")all.push(...String(pipeOut).split("\n").map(text=>({text,kind:"normal"})));
+  let pipeOut="",finalResult=result("");
+  for(const argv of group.pipeline){
+   const r=invoke(argv,pipeOut,Object.assign({},context,{raw:argv.join(" ")}));
+   if(r.clear){cleared=true;all=[]}
+   pipeOut=r.stdout??"";
+   exitCode=r.exitCode??0;
+   finalResult=r;
   }
   if(group.background){
    const id=nextJob++;
    jobs.set(id,{id,command:line,state:"running",output:pipeOut});
    all.push({text:"["+id+"] started  "+line,kind:"system"});
+  }else if(!finalResult.clear&&finalResult.lines?.length){
+   all.push(...finalResult.lines);
   }
   previousOperator=group.operator;
  }
@@ -84,7 +78,19 @@ function run(line,context={}){
 }
 const api={run,registerCommand,registerAlias,get cwd(){return cwd},get history(){return history.slice()},get commands(){return Array.from(new Set([...BUILTINS,...registry.keys()]))},get environment(){return Object.assign({},environment)},get aliases(){return Object.fromEntries(aliases)},get jobs(){return Array.from(jobs.values()).map(j=>Object.assign({},j))},get lastExit(){return lastExit},get lastOutput(){return lastOutput},getPath(path){return resolve(fs,normalizePath(cwd,path))}};
 return api}
-function parseSegments(tokens){const groups=[];let chain=[],pipeline=[],pending=null;const flushPipe=()=>{if(!pipeline.length)throw new Error("Missing command near pipe operator.");chain.push({pipeline:pipeline.slice(),operatorBefore:pending});pipeline=[];pending=null};const flushChain=op=>{if(pipeline.length)flushPipe();if(!chain.length)throw new Error("Missing command before operator.");groups.push({chain:chain.slice(),operator:op||";"});chain=[]};for(const t of tokens){if(t==="|"){flushPipe();continue}if(t===";"||t==="&&"||t==="||"){flushChain(t);pending=t;continue}if(t==="&"){if(pipeline.length)flushPipe();if(!chain.length)throw new Error("Nothing to run in background.");groups.push({chain:chain.slice(),background:true,operator:";"});chain=[];pipeline=[];pending=null;continue}if(!pipeline.length)pipeline.push([]);pipeline[pipeline.length-1].push(t)}if(pipeline.length)flushPipe();if(chain.length)groups.push({chain,operator:";"});for(let i=1;i<groups.length;i++)groups[i].chain[0].operatorBefore=groups[i-1].operator;return groups}
+function parseSegments(tokens){
+ const groups=[];let current=[],pipeline=[];
+ const finishCommand=()=>{if(!current.length)throw new Error("Missing command near shell operator.");pipeline.push(current);current=[]};
+ const finishGroup=operator=>{finishCommand();groups.push({pipeline:pipeline.slice(),operator:operator==="&"?";":operator,background:operator==="&"});pipeline=[]};
+ for(const token of tokens){
+  if(token==="|"){finishCommand();continue}
+  if(token===";"||token==="&&"||token==="||"||token==="&"){finishGroup(token);continue}
+  current.push(token);
+ }
+ if(current.length)finishGroup(";");
+ else if(pipeline.length)throw new Error("Missing command after pipe operator.");
+ return groups;
+}
 function mount(host){const session=createSession();host.insertAdjacentHTML("beforeend",'<section class="terminal-shell"><div class="terminal-chrome"><div class="terminal-lights"><i></i><i></i><i></i></div><span>CAIRN · COMMAND SESSION</span><span class="terminal-state">READY</span></div><div class="terminal-body"><div id="cairn-out" class="terminal-output" role="log" aria-live="polite"></div><form id="cairn-form" class="terminal-input"><span id="cairn-prompt">guest@sand:~$</span><input id="cairn-input" autocomplete="off" spellcheck="false" aria-label="Enter a CAIRN command"></form><div class="terminal-hint"><span><kbd>↑</kbd> <kbd>↓</kbd> history</span><span><kbd>Tab</kbd> complete</span><span><kbd>Ctrl</kbd>+<kbd>L</kbd> clear</span></div></div></section><p class="notice">Sandboxed virtual filesystem · simulated shell jobs · no host shell, real disks or kernel syscalls are accessed.</p>');const out=host.querySelector("#cairn-out"),input=host.querySelector("#cairn-input"),prompt=host.querySelector("#cairn-prompt");let historyIndex=0;function pathLabel(p){return p==="/home/guest"?"~":p.replace("/home/guest","~")}function append(text,kind="normal"){const line=document.createElement("div");line.className="terminal-line "+kind;line.textContent=text;out.appendChild(line);out.scrollTop=out.scrollHeight}function updatePrompt(){prompt.textContent="guest@sand:"+pathLabel(session.cwd)+"$"}function execute(line){append("guest@sand:"+pathLabel(session.cwd)+"$ "+line,"command");const r=session.run(line);if(r.clear)out.replaceChildren();for(const x of r.lines)append(x.text,x.kind);updatePrompt()}append("CAIRN "+VERSION+" / SAND COMMAND ENVIRONMENT","system");append("A calm, capable workspace. Type help to explore.","system");append("","normal");updatePrompt();host.querySelector("#cairn-form").addEventListener("submit",e=>{e.preventDefault();const line=input.value.trim();if(!line)return;execute(line);input.value="";historyIndex=session.history.length});input.addEventListener("keydown",e=>{if(e.key==="ArrowUp"){e.preventDefault();historyIndex=Math.max(0,historyIndex-1);input.value=session.history[historyIndex]||""}else if(e.key==="ArrowDown"){e.preventDefault();historyIndex=Math.min(session.history.length,historyIndex+1);input.value=session.history[historyIndex]||""}else if(e.key==="Tab"){e.preventDefault();const current=input.value.trim().split(/\s/)[0],matches=session.commands.filter(c=>c.startsWith(current));if(matches.length===1)input.value=matches[0]+" ";else if(matches.length>1)append(matches.join("    "),"system")}else if(e.key==="l"&&e.ctrlKey){e.preventDefault();out.replaceChildren()}});input.focus()}
 return {tokenize,lex,normalizePath,createFS,createSession,mount,commands:BUILTINS.slice(),version:VERSION};
 });
