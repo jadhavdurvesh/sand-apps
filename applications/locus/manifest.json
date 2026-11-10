@@ -1,0 +1,1 @@
+{"id":"locus","name":"LOCUS","version":"0.1.0","description":"File explorer for browsing and organizing user data.","phase":"core","status":"host-prototype","prototype":true,"entrypoint":"../../preview/index.html","target":"host-preview","sapp":"pending-abi"}
