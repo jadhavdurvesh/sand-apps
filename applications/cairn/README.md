@@ -1,29 +1,11 @@
 # CAIRN
 
-**CAIRN** is the SAND command environment. Version 0.4 expands its host prototype with session persistence, script execution, completion and simulated file metadata.
+**CAIRN** is the command environment for SAND OS. Version 0.5 organizes its command surface into POSIX-inspired utilities, a SAND-native namespace, and CAIRN shell/runtime features.
 
-## CAIRN 0.4
+- **POSIX-inspired:** `ls`, `cd`, `pwd`, `mkdir`, `cp`, `mv`, `find`, `head`, `tail`, `grep`, `which`, `man`, and more.
+- **SAND-native:** `sandctl`, `sapp`, `pkg`, `sysinfo`, `services`, `devices`, `session`, `theme`.
+- **CAIRN runtime:** pipes, conditionals, aliases, environment variables, scripts, completion, extensions, and simulated jobs.
 
-- Persistent browser session: virtual files, working directory, environment and aliases are restored from local browser storage
-- Shell scripts: \`source file.csh\` or \`sh file.csh\`; blank lines and comments are skipped, with a nesting limit
-- Tab completion for built-in/extension commands, aliases and virtual filesystem paths
-- Simulated metadata commands: \`stat\`, \`chmod\`, \`groups\`, \`id\`
-- Existing pipelines, conditional operators, command registry and virtual filesystem retained
+Run `help` and `man <command>`. See [the 0.5 command architecture](../../docs/cairn-0.5.md).
 
-## Try it
-
-\`\`\`text
-mkdir Archive
-cd Archive
-export PROJECT=SAND
-write build.csh "# prepare\\necho Building $PROJECT | upper"
-source build.csh
-stat build.csh
-chmod 600 build.csh
-\`\`\`
-
-## Persistence and security boundary
-
-The browser preview stores a JSON snapshot in browser local storage. This is convenience persistence, not secure storage or a real disk filesystem. File ownership, groups and modes are simulated metadata; they are not an enforced kernel security boundary. Shell scripts execute only inside the CAIRN command engine. No host shell or real OS process is invoked.
-
-Native SAPP integration remains pending stable public SAND filesystem, process, terminal and identity APIs.
+All commands operate inside the virtual filesystem. Native commands clearly report unavailable kernel APIs rather than inventing live data. CAIRN does not invoke a host shell or access real disks. This is POSIX-inspired, not POSIX-certified.

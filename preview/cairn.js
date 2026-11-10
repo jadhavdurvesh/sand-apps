@@ -1,9 +1,9 @@
 (function(root,factory){const api=factory();if(typeof module==="object"&&module.exports)module.exports=api;root.Cairn=api;})(typeof globalThis!=="undefined"?globalThis:this,function(){
 "use strict";
-const VERSION="0.4.0";
-const BUILTINS=["help","clear","echo","pwd","ls","cd","mkdir","touch","cat","write","rm","date","whoami","uname","history","version","export","env","unset","alias","unalias","true","false","upper","lower","grep","wc","sort","jobs","fg","bg","kill","source","sh","chmod","stat","groups","id"];
+const VERSION="0.5.0";
+const BUILTINS=["help","clear","echo","pwd","ls","cd","mkdir","touch","cat","write","rm","cp","mv","find","head","tail","which","man","date","whoami","uname","history","version","export","env","unset","alias","unalias","true","false","upper","lower","grep","wc","sort","jobs","fg","bg","kill","source","sh","chmod","stat","groups","id","sandctl","sapp","pkg","sysinfo","services","devices","session","theme"];
 const HELP={
-help:"help [command]                 Show command help",clear:"clear                          Clear the terminal",echo:"echo <text>                    Print text",pwd:"pwd                            Print the current directory",ls:"ls [-a] [path]                 List directory contents",cd:"cd [path]                      Change the current directory",mkdir:"mkdir <name>                   Create a directory",touch:"touch <file>                   Create an empty file",cat:"cat <file>                     Print a text file",write:"write <file> <text>            Create or replace a text file",rm:"rm --confirm <file>            Delete a file (explicit confirmation required)",export:"export NAME=value             Set a session environment variable",env:"env                            List session environment variables",unset:"unset NAME                    Remove an environment variable",alias:"alias [name=\"command\"]         List or define a command alias",unalias:"unalias <name>                Remove a command alias",upper:"upper                          Convert input to uppercase (supports pipes)",lower:"lower                          Convert input to lowercase (supports pipes)",grep:"grep <text>                    Filter piped lines by text",wc:"wc                             Count lines and words in piped input",sort:"sort                           Sort piped lines",jobs:"jobs                           List simulated background jobs",fg:"fg [job-id]                    Bring a simulated job to the foreground",bg:"bg [job-id]                    Resume a stopped simulated job",kill:"kill <job-id>                  Stop a simulated job",history:"history                        Show commands entered in this session",version:"version                        Show CAIRN version and target",source:"source <script>                Run a script from the virtual filesystem",sh:"sh <script>                     Run a script from the virtual filesystem",chmod:"chmod <mode> <path>             Change simulated file permissions",stat:"stat <path>                     Show simulated file metadata",groups:"groups                         Show the current user groups",id:"id                             Show simulated user and group identity"};
+help:"help [command]                 Show command help",clear:"clear                          Clear the terminal",echo:"echo <text>                    Print text",pwd:"pwd                            Print the current directory",ls:"ls [-a] [path]                 List directory contents",cd:"cd [path]                      Change the current directory",mkdir:"mkdir <name>                   Create a directory",touch:"touch <file>                   Create an empty file",cat:"cat <file>                     Print a text file",write:"write <file> <text>            Create or replace a text file",rm:"rm --confirm <file>            Delete a file (explicit confirmation required)",export:"export NAME=value             Set a session environment variable",env:"env                            List session environment variables",unset:"unset NAME                    Remove an environment variable",alias:"alias [name=\"command\"]         List or define a command alias",unalias:"unalias <name>                Remove a command alias",upper:"upper                          Convert input to uppercase (supports pipes)",lower:"lower                          Convert input to lowercase (supports pipes)",grep:"grep <text>                    Filter piped lines by text",wc:"wc                             Count lines and words in piped input",sort:"sort                           Sort piped lines",jobs:"jobs                           List simulated background jobs",fg:"fg [job-id]                    Bring a simulated job to the foreground",bg:"bg [job-id]                    Resume a stopped simulated job",kill:"kill <job-id>                  Stop a simulated job",history:"history                        Show commands entered in this session",version:"version                        Show CAIRN version and target",source:"source <script>                Run a script from the virtual filesystem",sh:"sh <script>                     Run a script from the virtual filesystem",chmod:"chmod <mode> <path>             Change simulated file permissions",stat:"stat <path>                     Show simulated file metadata",groups:"groups                         Show the current user groups",id:"id                             Show simulated user and group identity",cp:"cp <source> <destination>      Copy a virtual file",mv:"mv <source> <destination>      Move or rename a virtual file",find:"find [path] [-name pattern]     Find files and directories",head:"head [-n count] <file>         Show the first lines",tail:"tail [-n count] <file>         Show the last lines",which:"which <command>                Locate a CAIRN command",man:"man <command>                  Open the command manual",sandctl:"sandctl <status|help>           SAND system control interface",sapp:"sapp <list|info|verify>         SAPP application package tools",pkg:"pkg <list|info|verify>          Package-tool alias for sapp",sysinfo:"sysinfo                         Show available SAND system information",services:"services [list|status]          Inspect system services",devices:"devices [list]                  Inspect system devices",session:"session <info|save>             Show CAIRN session information",theme:"theme [dark|light|system]       Set the terminal theme preference"};
 function lex(input){const out=[];let token="",quote=null,escape=false,started=false;const push=()=>{if(started){out.push(token);token="";started=false}};for(let i=0;i<input.length;i++){const c=input[i];if(escape){token+=c;escape=false;started=true;continue}if(c==="\\"&&quote!=="'"){escape=true;started=true;continue}if(quote){if(c===quote)quote=null;else token+=c;started=true;continue}if(c==="'"||c==='"'){quote=c;started=true;continue}if(/\s/.test(c)){push();continue}const pair=input.slice(i,i+2);if(pair==="&&"||pair==="||"){push();out.push(pair);i++;continue}if(c==="|"||c===";"||c==="&"){push();out.push(c);continue}token+=c;started=true}if(escape)token+="\\";if(quote)throw new Error("Unclosed quote. Close the quoted argument and try again.");push();return out}
 function tokenize(input){return lex(input).filter(t=>!["&&","||","|",";","&"].includes(t))}
 function normalizePath(cwd,path){if(!path||path===".")return cwd;const parts=path.startsWith("/")?[]:cwd.split("/").filter(Boolean);for(const part of path.split("/")){if(!part||part===".")continue;if(part==="..")parts.pop();else parts.push(part)}return "/"+parts.join("/")}
@@ -36,6 +36,67 @@ case"env":return result(Object.entries(environment).sort(([a],[b])=>a.localeComp
 case"alias":if(!args.length)return result(Array.from(aliases,([k,v])=>k+"='"+v+"'").join("\n")||"No aliases defined.");{const raw=String(context.raw||""),m=raw.match(/^\s*alias\s+([A-Za-z][A-Za-z0-9_-]*)=(.*)$/);if(!m)return result("Usage: alias name=\"command\"",1);try{registerAlias(m[1],lex(m[2]).join(" "))}catch(e){return result(e.message,1)}return result("Alias defined: "+m[1])}
 case"unalias":if(!args[0])return result("Usage: unalias <name>",1);if(!aliases.delete(args[0]))return result("No such alias: "+args[0],1);return result("Alias removed: "+args[0]);
 case"true":return result("");case"false":return result("",1);case"upper":return result((stdin||args.join(" ")).toUpperCase());case"lower":return result((stdin||args.join(" ")).toLowerCase());case"grep":if(!args[0])return result("Usage: grep <text>",1);return result((stdin||"").split("\n").filter(line=>line.includes(args.join(" "))).join("\n"));case"wc":{const s=stdin||args.join(" "),lines=s?s.split("\n").length:0,words=(s.match(/\S+/g)||[]).length;return result(lines+" "+words+" "+s.length)}case"sort":return result((stdin||args.join(" ")).split("\n").sort((a,b)=>a.localeCompare(b)).join("\n"));
+
+case "cp": case "mv": {
+ if(args.length!==2)return result("Usage: "+cmd+" <source> <destination>",1);
+ const from=target(args[0]),to=target(args[1]),parts=to.split("/").filter(Boolean),name=parts.pop(),parent=resolve(fs,"/"+parts.join("/")),source=resolve(fs,from);
+ if(!source||source.type!=="file")return result(cmd+": source must be an existing file",1);
+ if(!parent||parent.type!=="dir")return result(cmd+": destination directory does not exist",1);
+ if(parent.children[name])return result(cmd+": destination already exists: "+to,1);
+ parent.children[name]=JSON.parse(JSON.stringify(source));
+ if(cmd==="mv"){const sp=from.split("/").filter(Boolean),sn=sp.pop(),sparent=resolve(fs,"/"+sp.join("/"));delete sparent.children[sn]}
+ return result((cmd==="cp"?"Copied ":"Moved ")+from+" -> "+to);
+}
+case "find": {
+ let start=".",pattern=null;
+ for(let i=0;i<args.length;i++){if(args[i]==="-name"){pattern=args[++i];if(!pattern)return result("find: -name requires a pattern",1)}else if(args[i].startsWith("-"))return result("find: unsupported option "+args[i],1);else start=args[i]}
+ const basePath=target(start),rootNode=resolve(fs,basePath);if(!rootNode)return result("find: no such path: "+start,1);
+ const found=[];const walk=(n,p)=>{const name=p.split("/").pop()||"/";if(!pattern||pattern==="*"||pattern===name)found.push(p);if(n.type==="dir")for(const [k,v] of Object.entries(n.children))walk(v,(p==="/"?"":p)+"/"+k)};
+ walk(rootNode,basePath);return result(found.join("\\n"));
+}
+case "head": case "tail": {
+ let count=10,file=args[0];if(args[0]==="-n"){count=Number(args[1]);file=args[2];if(!Number.isInteger(count)||count<0)return result(cmd+": invalid line count",1)}
+ if(!file&&!stdin)return result("Usage: "+cmd+" [-n count] <file>",1);
+ let content=stdin;if(file){const n=node(file);if(!n||n.type!=="file")return result(cmd+": not a file: "+file,1);content=n.content}
+ const lines=content.replace(/\\n$/,"").split("\\n");return result((cmd==="head"?lines.slice(0,count):lines.slice(-count)).join("\\n"));
+}
+case "which": {
+ if(!args[0])return result("Usage: which <command>",1);const name=args[0];
+ if(BUILTINS.includes(name))return result("/bin/cairn/"+name);
+ if(registry.has(name))return result("/extensions/"+name);
+ if(aliases.has(name))return result("alias: "+name+" -> "+aliases.get(name));
+ return result(name+": command not found",1);
+}
+case "man": {
+ if(!args[0])return result("Usage: man <command>",1);
+ return HELP[args[0]]?result("CAIRN MANUAL: "+args[0]+"\\n\\n"+HELP[args[0]]):result("No manual entry for "+args[0],1);
+}
+case "sandctl": {
+ const sub=args[0]||"help";
+ if(sub==="help")return result("SAND CONTROL\\n\\nsandctl status    Show host-preview integration status\\nsandctl help      Show this help");
+ if(sub==="status")return result("SAND CONTROL STATUS\\nTarget: SAND OS / x86-32\\nRuntime: CAIRN host preview\\nKernel connection: unavailable\\nNative control API: pending\\nNo host commands or system changes are performed");
+ return result("sandctl: unsupported operation: "+sub,1);
+}
+case "sapp": case "pkg": {
+ const sub=args[0]||"list";
+ if(sub==="list")return result("SAPP CATALOGUE\\n\\nNo native packages are installed in this host preview.\\nUse the SAND Apps repository build tools to create .sapp packages.");
+ if(sub==="info")return args[1]?result("Package: "+args[1]+"\\nFormat: SAPP v1\\nStatus: package metadata inspection requires a package file"):result("Usage: "+cmd+" info <package>",1);
+ if(sub==="verify")return args[1]?result("Use tools/sapp_inspect.py in the repository build environment. The terminal preview cannot read host package files.",1):result("Usage: "+cmd+" verify <package>",1);
+ return result(cmd+": use list, info or verify",1);
+}
+case "sysinfo": return result("SAND SYSTEM INFORMATION\\nOS: SAND OS development target\\nArchitecture: x86-32\\nShell: CAIRN "+VERSION+"\\nRuntime: browser host preview\\nKernel telemetry: unavailable\\nMemory and CPU readings: unavailable in preview");
+case "services": case "devices": return result("SAND "+(cmd==="services"?"SERVICES":"DEVICES")+"\\nThe "+(cmd==="services"?"service manager":"device manager")+" API is not exposed to CAIRN yet.\\nLive data is unavailable in host preview.",1);
+case "session": {
+ const sub=args[0]||"info";
+ if(sub==="info"||sub==="save")return result("CAIRN SESSION\\nUser: "+environment.USER+"\\nWorking directory: "+cwd+"\\nEnvironment variables: "+Object.keys(environment).length+"\\nAliases: "+aliases.size+"\\nVirtual filesystem: active\\nPersistence: browser adapter (when mounted)");
+ return result("Usage: session [info|save]",1);
+}
+case "theme": {
+ const allowed=["dark","light","system"];
+ if(!args[0])return result("Current theme: "+(environment.CAIRN_THEME||"system"));
+ if(!allowed.includes(args[0]))return result("Usage: theme [dark|light|system]",1);
+ environment.CAIRN_THEME=args[0];return result("Theme preference set to "+args[0]+" (preview UI integration pending)");
+}
 case"ls":{let p=".",all=false;for(const v of args){if(v==="-a")all=true;else p=v}const n=node(p);if(!n)return result("ls: no such path: "+p,1);if(n.type!=="dir")return result(p);return result(Object.keys(n.children).sort((a,b)=>a.localeCompare(b)).filter(x=>all||!x.startsWith(".")).map(x=>n.children[x].type==="dir"?x+"/":x).join("  ")||"Empty directory")}
 case"cd":{const p=args[0]||environment.HOME||"/home/guest",dest=target(p),n=resolve(fs,dest);if(!n||n.type!=="dir")return result("cd: not a directory: "+p,1);cwd=dest;environment.PWD=cwd;return result("")}
 case"mkdir":case"touch":{if(!args[0])return result(cmd+": missing path",1);const p=target(args[0]),parts=p.split("/").filter(Boolean),name=parts.pop(),parent=resolve(fs,"/"+parts.join("/"));if(!name||!parent||parent.type!=="dir")return result(cmd+": parent directory does not exist",1);if(parent.children[name])return result(cmd+": already exists: "+name,1);parent.children[name]=cmd==="mkdir"?{type:"dir",mode:493,owner:environment.USER,group:"users",children:{}}:{type:"file",mode:420,owner:environment.USER,group:"users",content:""};return result(cmd+": created "+p)}
