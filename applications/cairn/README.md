@@ -6,6 +6,6 @@
 - **SAND-native:** `sandctl`, `sapp`, `pkg`, `sysinfo`, `services`, `devices`, `session`, `theme`.
 - **CAIRN runtime:** pipes, conditionals, aliases, environment variables, scripts, completion, extensions, and simulated jobs.
 
-Run `commands`, `help --category SAND`, `apropos <term>`, and `man <command>`. The command index is also available from the terminal toolbar. See [the 0.5 command architecture](../../docs/cairn-0.5.md).
+Run `commands`, `help --category SAND`, `apropos <term>`, and `man <command>`. The command index is also available from the terminal toolbar. See [the 0.5 command architecture](../../docs/cairn-0.6.md).
 
 All commands operate inside the virtual filesystem. Native commands clearly report unavailable kernel APIs rather than inventing live data. CAIRN does not invoke a host shell or access real disks. This is POSIX-inspired, not POSIX-certified.
