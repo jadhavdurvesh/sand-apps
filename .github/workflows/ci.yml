@@ -1,0 +1,23 @@
+name: SAND Apps CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit tests
+        run: make test
+      - name: Build SAND Hello package
+        run: make clean all
+      - name: Upload SAPP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sand-hello-sapp
+          path: build/hello.sapp
