@@ -1,0 +1,12 @@
+{
+  "id": "morrow",
+  "name": "MORROW",
+  "version": "0.1.0",
+  "description": "Notes and personal workspace with notebooks and quick capture.",
+  "phase": "extended",
+  "status": "planned",
+  "prototype": false,
+  "entrypoint": null,
+  "target": "native-sand",
+  "sapp": "pending-abi"
+}

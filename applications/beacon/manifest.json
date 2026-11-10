@@ -1,0 +1,12 @@
+{
+  "id": "beacon",
+  "name": "BEACON",
+  "version": "0.1.0",
+  "description": "Network status, connections and configuration.",
+  "phase": "extended",
+  "status": "planned",
+  "prototype": false,
+  "entrypoint": null,
+  "target": "native-sand",
+  "sapp": "pending-abi"
+}
