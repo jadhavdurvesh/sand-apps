@@ -1,0 +1,8 @@
+build/
+dist/
+*.o
+*.elf
+*.sapp
+__pycache__/
+.pytest_cache/
+.venv/
