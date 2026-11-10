@@ -15,12 +15,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Unit tests
+      - name: Python unit tests
         run: make test
+      - name: CAIRN command-engine tests
+        run: node --test tests/test_cairn.cjs
       - name: Validate app catalogue
         run: make apps
       - name: Check preview JavaScript syntax
-        run: node --check preview/app.js
+        run: |
+          node --check preview/app.js
+          node --check preview/cairn.js
       - name: Build SAND Hello package
         run: make clean all
       - name: Upload SAPP artifact
