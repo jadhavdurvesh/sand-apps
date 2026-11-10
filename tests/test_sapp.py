@@ -19,10 +19,11 @@ class SappTests(unittest.TestCase):
         header = packer.ELF_HEADER.pack(ident, 2, 3, 1, 0x40000000,
             packer.ELF_HEADER.size, 0, 0, packer.ELF_HEADER.size,
             packer.ELF_PROGRAM.size, 1, 0, 0, 0)
+        payload_offset = 4096
         payload = b"\x90\xEB\xFE"
-        ph = packer.ELF_PROGRAM.pack(1, len(header) + packer.ELF_PROGRAM.size,
+        ph = packer.ELF_PROGRAM.pack(1, payload_offset,
             0x40000000, 0, len(payload), 4096, 5, 4096)
-        return header + ph + payload
+        return header + ph + bytes(payload_offset - len(header) - len(ph)) + payload
 
     def test_pack_and_inspect(self):
         with tempfile.TemporaryDirectory() as tmp:
