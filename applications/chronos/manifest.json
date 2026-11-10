@@ -1,0 +1,12 @@
+{
+  "id": "chronos",
+  "name": "CHRONOS",
+  "version": "0.1.0",
+  "description": "Clock, alarms, timers and stopwatch.",
+  "phase": "extended",
+  "status": "planned",
+  "prototype": false,
+  "entrypoint": null,
+  "target": "native-sand",
+  "sapp": "pending-abi"
+}

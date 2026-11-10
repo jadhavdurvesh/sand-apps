@@ -1,0 +1,12 @@
+{
+  "id": "prism",
+  "name": "PRISM",
+  "version": "0.1.0",
+  "description": "Image viewer with zoom, rotation and metadata.",
+  "phase": "extended",
+  "status": "planned",
+  "prototype": false,
+  "entrypoint": null,
+  "target": "native-sand",
+  "sapp": "pending-abi"
+}

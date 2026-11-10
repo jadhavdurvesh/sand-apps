@@ -1,0 +1,12 @@
+{
+  "id": "crate",
+  "name": "CRATE",
+  "version": "0.1.0",
+  "description": "Archive manager for browsing, creating and extracting archives.",
+  "phase": "extended",
+  "status": "planned",
+  "prototype": false,
+  "entrypoint": null,
+  "target": "native-sand",
+  "sapp": "pending-abi"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "glyph",
+  "name": "GLYPH",
+  "version": "0.1.0",
+  "description": "Text and code editor with tabs, search and syntax-aware editing.",
+  "phase": "extended",
+  "status": "planned",
+  "prototype": false,
+  "entrypoint": null,
+  "target": "native-sand",
+  "sapp": "pending-abi"
+}

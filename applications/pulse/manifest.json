@@ -1,0 +1,12 @@
+{
+  "id": "pulse",
+  "name": "PULSE",
+  "version": "0.1.0",
+  "description": "System monitor for resource usage, storage and process activity.",
+  "phase": "extended",
+  "status": "planned",
+  "prototype": false,
+  "entrypoint": null,
+  "target": "native-sand",
+  "sapp": "pending-abi"
+}

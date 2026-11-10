@@ -1,0 +1,12 @@
+{
+  "id": "spectra",
+  "name": "SPECTRA",
+  "version": "0.1.0",
+  "description": "Local media player and library.",
+  "phase": "extended",
+  "status": "planned",
+  "prototype": false,
+  "entrypoint": null,
+  "target": "native-sand",
+  "sapp": "pending-abi"
+}
