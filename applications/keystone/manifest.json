@@ -1,0 +1,1 @@
+{"id":"keystone","name":"KEYSTONE","version":"0.1.0","description":"System settings and appearance preferences.","phase":"core","status":"host-prototype","prototype":true,"entrypoint":"../../preview/index.html","target":"host-preview","sapp":"pending-abi"}

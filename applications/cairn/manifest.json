@@ -1,0 +1,1 @@
+{"id":"cairn","name":"CAIRN","version":"0.1.0","description":"Keyboard-first command environment and terminal.","phase":"core","status":"host-prototype","prototype":true,"entrypoint":"../../preview/index.html","target":"host-preview","sapp":"pending-abi"}
