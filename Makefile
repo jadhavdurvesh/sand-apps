@@ -4,11 +4,14 @@ LD ?= ld
 BUILD := build
 APP := hello
 
-.PHONY: all tools hello test clean
-all: tools hello
+.PHONY: all tools hello apps test clean
+all: tools apps hello
 
 tools:
 	$(PYTHON) -m compileall -q tools
+
+apps:
+	$(PYTHON) tools/validate_apps.py
 
 $(BUILD):
 	mkdir -p $(BUILD)
