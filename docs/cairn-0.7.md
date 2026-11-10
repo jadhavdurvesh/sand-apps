@@ -57,3 +57,7 @@ Future apps should request narrowly scoped platform services through a shared ru
 - Filesystem mode/owner metadata remains simulated.
 - Native process execution, kernel services, hardware discovery, networking and telemetry remain unavailable until a native adapter and kernel ABI exist.
 - This milestone changes only the SAND Apps repository.
+
+
+## Extension isolation
+Extension handlers receive a restricted session facade, not the internal session object or virtual filesystem. File metadata/content is exposed only when `fs.read` is granted; session environment values require `session.read`. The facade does not expose the raw snapshot, command-registration internals, mutable filesystem nodes, or platform adapter. Calls through its command runner still pass through CAIRN's capability checks. Native adapters must independently enforce authorization.
