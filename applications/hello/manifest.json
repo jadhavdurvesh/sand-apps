@@ -1,0 +1,10 @@
+{
+  "name": "sand-hello",
+  "display_name": "SAND Hello",
+  "version": "0.1.0",
+  "description": "Minimal executable used to validate the SAPP v1 toolchain.",
+  "architecture": "x86-32",
+  "entry": "_start",
+  "status": "loader-smoke-test",
+  "capabilities": []
+}
