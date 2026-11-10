@@ -1,0 +1,11 @@
+"use strict";
+const test=require("node:test");
+const assert=require("node:assert/strict");
+const Cairn=require("../preview/cairn.js");
+test("tokenizer supports quoted arguments",()=>assert.deepEqual(Cairn.tokenize('write "hello world.txt" "a note with spaces"'),["write","hello world.txt","a note with spaces"]));
+test("tokenizer rejects unclosed quotes",()=>assert.throws(()=>Cairn.tokenize('echo "unfinished')));
+test("path normalization handles parent and absolute paths",()=>{assert.equal(Cairn.normalizePath("/home/guest/Documents","../Desktop"),"/home/guest/Desktop");assert.equal(Cairn.normalizePath("/home/guest","/home/guest/Documents"),"/home/guest/Documents")});
+test("session supports directory navigation and listing",()=>{const s=Cairn.createSession();assert.match(s.run("ls").lines[0].text,/Documents/);s.run("cd Documents");assert.equal(s.cwd,"/home/guest/Documents");assert.match(s.run("pwd").lines[0].text,/Documents$/)});
+test("session can create, write and read files",()=>{const s=Cairn.createSession();assert.equal(s.run("touch draft.txt").lines[0].kind,"success");s.run('write draft.txt "hello sand"');assert.equal(s.run("cat draft.txt").lines[0].text,"hello sand")});
+test("deletion requires explicit confirmation",()=>{const s=Cairn.createSession();assert.equal(s.run("touch remove-me.txt").lines[0].kind,"success");assert.equal(s.run("rm remove-me.txt").lines[0].kind,"error");assert.equal(s.run("rm --confirm remove-me.txt").lines[0].kind,"success")});
+test("cannot traverse outside virtual root",()=>{const s=Cairn.createSession();s.run("cd ../../../../");assert.equal(s.cwd,"/");assert.equal(s.run("ls").lines[0].text,"home/")});
