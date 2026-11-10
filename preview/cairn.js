@@ -58,7 +58,7 @@ case "head": case "tail": {
  let count=10,file=args[0];if(args[0]==="-n"){count=Number(args[1]);file=args[2];if(!Number.isInteger(count)||count<0)return result(cmd+": invalid line count",1)}
  if(!file&&!stdin)return result("Usage: "+cmd+" [-n count] <file>",1);
  let content=stdin;if(file){const n=node(file);if(!n||n.type!=="file")return result(cmd+": not a file: "+file,1);content=n.content}
- const lines=content.replace(/\\n$/,"").split("\\n");return result((cmd==="head"?lines.slice(0,count):lines.slice(-count)).join("\\n"));
+ const lines=content.replace(/\n$/,"").split("\n");return result((cmd==="head"?lines.slice(0,count):count===0?[]:lines.slice(-count)).join("\n"));
 }
 case "which": {
  if(!args[0])return result("Usage: which <command>",1);const name=args[0];
