@@ -1,5 +1,3 @@
-## Host prototype — 0.3.0
+## Host prototype — 0.3.1
 
-CAIRN now includes a reusable command registry, shell operators (pipe, conditional and sequential), session environment variables, aliases, pipeline filters and simulated background-job controls. It remains a host-side sandbox: commands never execute on the host and jobs are not OS processes. Native integration awaits documented SAND process, filesystem and terminal APIs.
-
-Try: help; export PROJECT=sand; echo Building $PROJECT | upper; alias ll="ls -a"; ll; echo first ; echo second; echo simulated-job &; jobs; kill 1.
+The shell engine now has corrected pipeline output and conditional short-circuit evaluation across command groups. Pipelines return only the final stage output; `&&` and `||` respect the previous command's exit status. This remains a sandboxed host prototype; job controls are simulated rather than real OS processes.

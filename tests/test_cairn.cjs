@@ -16,3 +16,6 @@ test("pipeline filters",()=>{const s=Cairn.createSession();assert.equal(s.run("e
 test("command extensions are registerable",()=>{const s=Cairn.createSession();s.registerCommand("greet",({args})=>"Hello "+args.join(" "));assert.equal(s.run("greet SAND").stdout,"Hello SAND")});
 test("background jobs are simulated and controllable",()=>{const s=Cairn.createSession();assert.match(s.run("echo task &").stdout,/\[1\] started/);assert.equal(s.jobs[0].state,"running");s.run("kill 1");assert.equal(s.jobs[0].state,"stopped");s.run("bg 1");assert.equal(s.jobs[0].state,"running");s.run("fg 1");assert.equal(s.jobs[0].state,"completed")});
 test("malformed pipe syntax rejected",()=>assert.equal(Cairn.createSession().run("echo hello |").exitCode,2));
+
+test("pipes return only the final command output",()=>{const s=Cairn.createSession();assert.equal(s.run("echo hello sand | upper").stdout,"HELLO SAND")});
+test("conditional operators short-circuit across command groups",()=>{const s=Cairn.createSession();assert.equal(s.run("false && echo no || echo yes").stdout,"yes");assert.equal(s.run("true || echo no").stdout,"");assert.equal(s.run("true && echo yes").stdout,"yes")});
