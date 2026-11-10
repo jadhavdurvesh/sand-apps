@@ -7,7 +7,18 @@ help:"help [command]                 Show command help",clear:"clear            
 function lex(input){const out=[];let token="",quote=null,escape=false,started=false;const push=()=>{if(started){out.push(token);token="";started=false}};for(let i=0;i<input.length;i++){const c=input[i];if(escape){token+=c;escape=false;started=true;continue}if(c==="\\"&&quote!=="'"){escape=true;started=true;continue}if(quote){if(c===quote)quote=null;else token+=c;started=true;continue}if(c==="'"||c==='"'){quote=c;started=true;continue}if(/\s/.test(c)){push();continue}const pair=input.slice(i,i+2);if(pair==="&&"||pair==="||"){push();out.push(pair);i++;continue}if(c==="|"||c===";"||c==="&"){push();out.push(c);continue}token+=c;started=true}if(escape)token+="\\";if(quote)throw new Error("Unclosed quote. Close the quoted argument and try again.");push();return out}
 function tokenize(input){return lex(input).filter(t=>!["&&","||","|",";","&"].includes(t))}
 function normalizePath(cwd,path){if(!path||path===".")return cwd;const parts=path.startsWith("/")?[]:cwd.split("/").filter(Boolean);for(const part of path.split("/")){if(!part||part===".")continue;if(part==="..")parts.pop();else parts.push(part)}return "/"+parts.join("/")}
-function createFS(){return {"/":{type:"dir",children:{home:{type:"dir",children:{guest:{type:"dir",children:{Desktop:{type:"dir",children:{}},Documents:{type:"dir",children:{"welcome.txt":{type:"file",content:"Welcome to CAIRN.\nThis is a simulated SAND workspace.\n"},"ideas.md":{type:"file",content:"# Ideas\n\nBuild something thoughtful.\n"} }},Projects:{type:"dir",children:{"sand-apps":{type:"dir",children:{}}}},Downloads:{type:"dir",children:{}}}}}}}}}}}
+function createFS(){
+ const root={type:"dir",children:{}};
+ const mkdir=path=>{let n=root;for(const part of path.split("/").filter(Boolean)){if(!n.children[part])n.children[part]={type:"dir",children:{}};n=n.children[part];if(n.type!=="dir")throw new Error("Invalid seeded filesystem path");}};
+ const put=(path,content)=>{const parts=path.split("/").filter(Boolean),name=parts.pop(),parentPath="/"+parts.join("/");mkdir(parentPath);let parent=root;for(const part of parts)parent=parent.children[part];parent.children[name]={type:"file",content};};
+ mkdir("/home/guest/Desktop");
+ mkdir("/home/guest/Documents");
+ mkdir("/home/guest/Projects/sand-apps");
+ mkdir("/home/guest/Downloads");
+ put("/home/guest/Documents/welcome.txt","Welcome to CAIRN.\nThis is a simulated SAND workspace.\n");
+ put("/home/guest/Documents/ideas.md","# Ideas\n\nBuild something thoughtful.\n");
+ return {"/":root};
+}
 function resolve(fs,path){let n=fs["/"];if(path==="/")return n;for(const p of path.split("/").filter(Boolean)){if(!n||n.type!=="dir")return null;n=n.children[p]}return n||null}
 function createSession(options={}){const fs=options.fs||createFS(),history=[],environment=Object.assign({USER:"guest",HOME:"/home/guest",PWD:"/home/guest",SHELL:"/bin/cairn",TERM:"sand-256color"},options.environment||{}),aliases=new Map(),registry=new Map(),jobs=new Map();let cwd="/home/guest",nextJob=1,lastExit=0,lastOutput="";
 const result=(stdout="",exitCode=0,extra={})=>Object.assign({stdout:String(stdout),exitCode,lines:String(stdout).split("\n").map(text=>({text,kind:exitCode?"error":"normal"}))},extra),target=p=>normalizePath(cwd,p),node=p=>resolve(fs,target(p));
