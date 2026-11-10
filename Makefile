@@ -1,0 +1,30 @@
+PYTHON ?= python3
+CC ?= gcc
+LD ?= ld
+BUILD := build
+APP := hello
+
+.PHONY: all tools hello test clean
+all: tools hello
+
+tools:
+	$(PYTHON) -m compileall -q tools
+
+$(BUILD):
+	mkdir -p $(BUILD)
+
+$(BUILD)/$(APP).o: applications/$(APP)/start.S | $(BUILD)
+	$(CC) -m32 -c -ffreestanding -fno-pic -o $@ $<
+
+$(BUILD)/$(APP).elf: $(BUILD)/$(APP).o applications/$(APP)/linker.ld
+	$(LD) -m elf_i386 -T applications/$(APP)/linker.ld -o $@ $<
+
+hello: $(BUILD)/$(APP).elf
+	$(PYTHON) tools/sapp_pack.py $< $(BUILD)/$(APP).sapp --name sand-hello --version 0.1.0
+	$(PYTHON) tools/sapp_inspect.py $(BUILD)/$(APP).sapp
+
+test:
+	$(PYTHON) -m unittest discover -s tests -v
+
+clean:
+	rm -rf $(BUILD) dist
