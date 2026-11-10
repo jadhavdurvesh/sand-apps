@@ -1,30 +1,29 @@
 # CAIRN
 
-**CAIRN** is the SAND command environment. Its host prototype is a reusable command engine with a sandboxed virtual filesystem, command registry, session environment and keyboard-first terminal UI.
+**CAIRN** is the SAND command environment. Version 0.4 expands its host prototype with session persistence, script execution, completion and simulated file metadata.
 
-## Host prototype — 0.3.1
+## CAIRN 0.4
 
-- Command registry for first-party and extension built-ins
-- Quoted argument parsing and environment-variable expansion
-- Pipes, conditional execution and sequential command operators
-- Session variables through `export`, `env` and `unset`
-- Aliases through `alias` and `unalias`
-- Pipeline filters: `upper`, `lower`, `grep`, `wc` and `sort`
-- Simulated background job table: `jobs`, `fg`, `bg` and `kill`
-- Sandboxed virtual filesystem; no host shell or real disk access
+- Persistent browser session: virtual files, working directory, environment and aliases are restored from local browser storage
+- Shell scripts: \`source file.csh\` or \`sh file.csh\`; blank lines and comments are skipped, with a nesting limit
+- Tab completion for built-in/extension commands, aliases and virtual filesystem paths
+- Simulated metadata commands: \`stat\`, \`chmod\`, \`groups\`, \`id\`
+- Existing pipelines, conditional operators, command registry and virtual filesystem retained
 
 ## Try it
 
-```text
-help
-export PROJECT=sand
-echo Building $PROJECT | upper
-alias ll="ls -a"
-ll
-false && echo no || echo yes
-echo simulated-job &
-jobs
-kill 1
-```
+\`\`\`text
+mkdir Archive
+cd Archive
+export PROJECT=SAND
+write build.csh "# prepare\\necho Building $PROJECT | upper"
+source build.csh
+stat build.csh
+chmod 600 build.csh
+\`\`\`
 
-Background jobs are lifecycle simulations, not operating-system processes. Native integration awaits documented SAND process, filesystem and terminal APIs.
+## Persistence and security boundary
+
+The browser preview stores a JSON snapshot in browser local storage. This is convenience persistence, not secure storage or a real disk filesystem. File ownership, groups and modes are simulated metadata; they are not an enforced kernel security boundary. Shell scripts execute only inside the CAIRN command engine. No host shell or real OS process is invoked.
+
+Native SAPP integration remains pending stable public SAND filesystem, process, terminal and identity APIs.

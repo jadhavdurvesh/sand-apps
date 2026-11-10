@@ -21,3 +21,11 @@ test("conditional operators short-circuit across command groups",()=>{const s=Ca
 
 test("trailing and leading pipes are rejected",()=>{const s=Cairn.createSession();assert.equal(s.run("echo hello |").exitCode,2);assert.equal(s.run("| upper").exitCode,2)});
 test("empty output does not create phantom blank lines",()=>{const s=Cairn.createSession();assert.equal(s.run("false && echo no || echo yes").stdout,"yes")});
+
+test("session snapshot restores filesystem, cwd, environment and aliases",()=>{const first=Cairn.createSession();first.run("mkdir Archive");first.run("cd Archive");first.run("export MODE=restored");first.registerAlias("ll","ls -a");const second=Cairn.createSession({state:first.snapshot()});assert.equal(second.cwd,"/home/guest/Archive");assert.equal(second.environment.MODE,"restored");assert.equal(second.aliases.ll,"ls -a");assert.equal(second.run("pwd").stdout,"/home/guest/Archive")});
+test("command completion suggests commands and virtual paths",()=>{const s=Cairn.createSession();assert.ok(s.complete("ech").includes("echo"));assert.ok(s.complete("cat Documents/we").includes("Documents/welcome.txt"))});
+test("scripts execute line by line and ignore comments",()=>{const s=Cairn.createSession();s.run("write Documents/demo.csh \"# comment\\nexport SCRIPTED=yes\\necho $SCRIPTED\"");assert.equal(s.run("source Documents/demo.csh").stdout,"yes");assert.equal(s.environment.SCRIPTED,"yes")});
+test("scripts reject missing files and excessive nesting",()=>{const s=Cairn.createSession();assert.equal(s.run("source missing.csh").exitCode,1);s.run("write loop.csh \"source loop.csh\"");assert.equal(s.run("source loop.csh").exitCode,1)});
+test("chmod and stat expose simulated permission metadata",()=>{const s=Cairn.createSession();s.run("touch private.txt");assert.equal(s.run("chmod 600 private.txt").exitCode,0);assert.match(s.run("stat private.txt").stdout,/Mode: 600/);assert.match(s.run("stat private.txt").stdout,/Owner: guest/)});
+test("chmod rejects invalid modes and missing paths",()=>{const s=Cairn.createSession();assert.equal(s.run("chmod 999 missing").exitCode,1);assert.equal(s.run("chmod 640 absent").exitCode,1)});
+test("identity commands report simulated user and groups",()=>{const s=Cairn.createSession();assert.equal(s.run("groups").stdout,"users");assert.match(s.run("id").stdout,/uid=1000\\(guest\\)/)});
