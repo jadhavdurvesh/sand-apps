@@ -35,9 +35,42 @@ case"jobs":return result(Array.from(jobs.values()).map(j=>"["+j.id+"] "+j.state+
 case"fg":case"bg":case"kill":{const id=Number(args[0]||Array.from(jobs.keys()).pop()),job=jobs.get(id);if(!job)return result(cmd+": no such job",1);if(cmd==="kill"){job.state="stopped";return result("["+id+"] stopped  "+job.command)}job.state=cmd==="fg"?"completed":"running";return result("["+id+"] "+job.state+"  "+job.command)}
 default:return result("Unknown command: "+cmd+". Type help to see available commands.",1)
 }}
-function run(line,context={}){let tokens;try{tokens=lex(line.trim())}catch(e){return result(e.message,2)}if(!tokens.length)return result("");history.push(line);let groups;try{groups=parseSegments(tokens)}catch(e){lastExit=2;return result(e.message,2)}let all=[],exitCode=0,cleared=false;
-for(const group of groups){let prior=0,pipeOut="";for(let i=0;i<group.chain.length;i++){const stage=group.chain[i];if(i>0&&stage.operatorBefore==="&&"&&prior!==0)continue;if(i>0&&stage.operatorBefore==="||"&&prior===0)continue;for(let p=0;p<stage.pipeline.length;p++){const argv=stage.pipeline[p];if(!argv.length)continue;const r=invoke(argv,pipeOut,Object.assign({},context,{raw:argv.join(" ")}));if(r.clear){cleared=true;all=[]}pipeOut=r.stdout??"";if(p===stage.pipeline.length-1){prior=r.exitCode??0;if(pipeOut!==""||r.lines?.length)all.push(...(r.lines||String(pipeOut).split("\n").map(text=>({text,kind:"normal"}))))}}}exitCode=prior;if(group.background){const id=nextJob++;jobs.set(id,{id,command:line,state:"running",output:pipeOut});all.push({text:"["+id+"] started  "+line,kind:"system"})}}
-lastExit=exitCode;lastOutput=all.map(x=>x.text).join("\n");return {stdout:lastOutput,lines:all,exitCode,clear:cleared,cwd}}
+function run(line,context={}){
+ let tokens;try{tokens=lex(line.trim())}catch(e){return result(e.message,2)}
+ if(!tokens.length)return result("");
+ history.push(line);
+ let groups;try{groups=parseSegments(tokens)}catch(e){lastExit=2;return result(e.message,2)}
+ let all=[],exitCode=0,cleared=false,previousOperator=";";
+ for(const group of groups){
+  if(previousOperator==="&&"&&exitCode!==0){previousOperator=group.operator;continue}
+  if(previousOperator==="||"&&exitCode===0){previousOperator=group.operator;continue}
+  let prior=0,pipeOut="",finalResult=result("");
+  for(const stage of group.chain){
+   for(const argv of stage.pipeline){
+    if(!argv.length)continue;
+    const r=invoke(argv,pipeOut,Object.assign({},context,{raw:argv.join(" ")}));
+    if(r.clear){cleared=true;all=[]}
+    pipeOut=r.stdout??"";
+    prior=r.exitCode??0;
+    finalResult=r;
+   }
+  }
+  exitCode=prior;
+  if(!cleared||pipeOut!==""){
+   if(finalResult.lines?.length)all.push(...finalResult.lines);
+   else if(pipeOut!=="")all.push(...String(pipeOut).split("\n").map(text=>({text,kind:"normal"})));
+  }
+  if(group.background){
+   const id=nextJob++;
+   jobs.set(id,{id,command:line,state:"running",output:pipeOut});
+   all.push({text:"["+id+"] started  "+line,kind:"system"});
+  }
+  previousOperator=group.operator;
+ }
+ lastExit=exitCode;
+ lastOutput=all.map(x=>x.text).join("\n");
+ return {stdout:lastOutput,lines:all,exitCode,clear:cleared,cwd};
+}
 const api={run,registerCommand,registerAlias,get cwd(){return cwd},get history(){return history.slice()},get commands(){return Array.from(new Set([...BUILTINS,...registry.keys()]))},get environment(){return Object.assign({},environment)},get aliases(){return Object.fromEntries(aliases)},get jobs(){return Array.from(jobs.values()).map(j=>Object.assign({},j))},get lastExit(){return lastExit},get lastOutput(){return lastOutput},getPath(path){return resolve(fs,normalizePath(cwd,path))}};
 return api}
 function parseSegments(tokens){const groups=[];let chain=[],pipeline=[],pending=null;const flushPipe=()=>{if(!pipeline.length)throw new Error("Missing command near pipe operator.");chain.push({pipeline:pipeline.slice(),operatorBefore:pending});pipeline=[];pending=null};const flushChain=op=>{if(pipeline.length)flushPipe();if(!chain.length)throw new Error("Missing command before operator.");groups.push({chain:chain.slice(),operator:op||";"});chain=[]};for(const t of tokens){if(t==="|"){flushPipe();continue}if(t===";"||t==="&&"||t==="||"){flushChain(t);pending=t;continue}if(t==="&"){if(pipeline.length)flushPipe();if(!chain.length)throw new Error("Nothing to run in background.");groups.push({chain:chain.slice(),background:true,operator:";"});chain=[];pipeline=[];pending=null;continue}if(!pipeline.length)pipeline.push([]);pipeline[pipeline.length-1].push(t)}if(pipeline.length)flushPipe();if(chain.length)groups.push({chain,operator:";"});for(let i=1;i<groups.length;i++)groups[i].chain[0].operatorBefore=groups[i-1].operator;return groups}
