@@ -36,7 +36,7 @@ Each application now has its own source module under `applications/<id>/`. The d
 
 ## Shared application runtime and desktop services
 
-The browser preview now opens a windowed desktop shell with a launcher, dock, draggable/resizable app windows, focus/minimize/maximize/close controls, notification center and clock. LOCUS uses the per-app virtual filesystem; files persist in browser storage. The SDK provides a common host-side runtime plus desktop service contracts for app lifecycle, capability permissions, per-app storage, typed settings, IPC, logical windows, notifications, desktop events and private virtual files. The fourteen-app browser preview launches through the desktop host. See [runtime documentation](docs/app-runtime.md) and [desktop services](docs/desktop-services.md). These are host-preview implementations, not native kernel or desktop services.
+The browser preview now opens a windowed desktop shell with a launcher, dock, draggable/resizable app windows, focus/minimize/maximize/close controls, notification center and clock. LOCUS uses the per-app virtual filesystem; files persist in browser storage. The SDK provides a common host-side runtime plus desktop service contracts for app lifecycle, capability permissions, per-app storage, typed settings, IPC, logical windows, notifications, desktop events and private virtual files. Public TypeScript declarations are available in `sdk/types/sand.d.ts`, with a developer guide at [docs/sdk.md](docs/sdk.md). The fourteen-app browser preview launches through the desktop host. See [runtime documentation](docs/app-runtime.md) and [desktop services](docs/desktop-services.md). These are host-preview implementations, not native kernel or desktop services.
 
 ## Build and test
 
