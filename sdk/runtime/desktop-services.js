@@ -35,6 +35,7 @@ function createDesktopHost(options={}){
    const id="window-"+(++windowSeq),win={id,appId:req.appId,title,width,height,state:"normal",createdAt:Date.now()};
    windows.set(id,win);hub.emit("desktop.window.created",win);return clone(win)
   }
+  if(key==="window.list")return Array.from(windows.values()).filter(w=>w.appId===req.appId).map(clone);
   if(key.startsWith("window.")){
    const win=windows.get(p.windowId);if(!win||win.appId!==req.appId)fail("WINDOW_NOT_FOUND","Window does not belong to this application");
    if(key==="window.destroy"){windows.delete(win.id);hub.emit("desktop.window.destroyed",{appId:req.appId,windowId:win.id});return {ok:true}}
@@ -42,7 +43,6 @@ function createDesktopHost(options={}){
    if(key==="window.minimize"){win.state="minimized";hub.emit("desktop.window.minimized",win);return clone(win)}
    if(key==="window.maximize"){win.state="maximized";hub.emit("desktop.window.maximized",win);return clone(win)}
   }
-  if(key==="window.list")return Array.from(windows.values()).filter(w=>w.appId===req.appId).map(clone);
   if(key==="notifications.create"){
    const title=typeof p.title==="string"&&p.title.trim()?p.title.trim().slice(0,100):"Notification";
    const body=typeof p.body==="string"?p.body.slice(0,1000):"";
