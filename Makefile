@@ -4,7 +4,7 @@ LD ?= ld
 BUILD := build
 APP := hello
 
-.PHONY: all tools hello apps test test-js clean
+.PHONY: all tools hello apps test test-js test-trust clean
 all: tools apps hello
 
 tools:
@@ -28,6 +28,9 @@ hello: $(BUILD)/$(APP).elf
 
 test:
 	$(PYTHON) -m unittest discover -s tests -v
+
+test-trust:
+	$(PYTHON) -m unittest tests.test_sandcert -v
 
 test-js:
 	node --test tests/test_cairn.cjs tests/test_runtime.cjs tests/test_desktop.cjs tests/test_app_modules.cjs tests/test_ui.cjs tests/test_package_manager.cjs tests/test_sdk_types.cjs
