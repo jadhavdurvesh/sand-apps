@@ -129,6 +129,8 @@ def publisher_issue(args):
     root_public = authority["publicKeyPem"].encode("ascii")
     if key_id(root_public) != authority.get("keyId"):
         raise TrustError("authority public key fingerprint mismatch")
+    if public_pem(root_key) != root_public:
+        raise TrustError("root private key does not match the authority public key")
     out = Path(args.output).resolve()
     out.mkdir(parents=True, exist_ok=True)
     private, public = out / "publisher-private.pem", out / "publisher-public.pem"
