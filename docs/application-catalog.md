@@ -12,22 +12,22 @@
 | **GLYPH** | Text and code editor for its private file workspace |
 | **MORROW** | Private notes and personal workspace |
 
-All eight have independent application modules and interactive host-side prototypes in `preview/`.
+All thirteen have independent application modules and interactive host-side prototypes in `preview/`.
 
-## Extended suite — catalogued, not yet implemented
+## Extended five — implemented host prototypes
 
 | App | Responsibility |
 |---|---|
-| **PULSE** | CPU, memory, storage and process monitor |
-| **PRISM** | Image viewer and metadata |
-| **CRATE** | Archive manager |
+| **PULSE** | Browser-visible runtime, storage estimate and host information; native CPU/process metrics await kernel services |
+| **PRISM** | Local image viewer with zoom, rotation and dimensions |
+| **CRATE** | SANDPACK bundle creator, inspector and extractor (JSON-based, not ZIP) |
 | **CHRONOS** | Clock, alarms, timers and stopwatch |
-| **SPECTRA** | Local media player and library |
-| **BEACON** | Network status and configuration |
+| **SPECTRA** | Local audio/video player and queue |
+| **BEACON** | Read-only browser network status; no native configuration |
 
 ## Delivery rules
 
-1. The eight core apps are implemented as host-side prototypes. Extended apps are catalogued, not represented as implemented.
+1. The eight core apps and five extended apps have host-side prototypes. Their browser-only limits are documented; native integration requires OS services.
 2. Every app has a stable ID and manifest.
 3. Host prototypes are development previews, not native SAND OS applications.
 4. Native integration requires documented, versioned OS services and a stable application ABI.
