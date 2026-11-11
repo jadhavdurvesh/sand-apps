@@ -187,7 +187,9 @@ def sign_package(args):
     pub = cert.get("publicKeyPem", "").encode("ascii")
     if key_id(pub) != cert.get("keyId"):
         raise TrustError("publisher certificate public key fingerprint mismatch")
-    if public_pem(args.private_key) != pub:\n        raise TrustError("publisher private key does not match the certificate public key")\n    signature = sign_bytes(args.private_key, canonical(unsigned_package(package)))
+    if public_pem(args.private_key) != pub:
+        raise TrustError("publisher private key does not match the certificate public key")
+    signature = sign_bytes(args.private_key, canonical(unsigned_package(package)))
     package["signature"] = {"algorithm": ALGORITHM, "publisherCertificate": cert,
                             "value": base64.b64encode(signature).decode("ascii")}
     write_json(args.output, package)
