@@ -8,5 +8,13 @@
   "prototype": false,
   "entrypoint": null,
   "target": "native-sand",
-  "sapp": "pending-abi"
+  "sapp": "pending-abi",
+  "capabilities": [
+    "storage.read",
+    "settings.read",
+    "platform.info.read",
+    "platform.process.read",
+    "platform.device.read",
+    "platform.window.create"
+  ]
 }
