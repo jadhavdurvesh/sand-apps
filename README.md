@@ -26,7 +26,7 @@ Then open `http://localhost:8000/preview/`. See [preview usage and shortcuts](do
 
 **PULSE** (host monitor), **PRISM** (image viewer), **CRATE** (SANDPACK bundles), **SPECTRA** (local media player), **BEACON** (network status).
 
-## First-party application source
+## FORGE and SAND packages\n\nFORGE manages installed applications and user-approved capabilities. SANDPKG v1 packages can be built, inspected and validated with `tools/sandpkg.py`; `templates/app/` contains a starter. Third-party packages are validated and stored but intentionally not executable until native isolation, trusted signatures and a stable ABI exist. See [the package system guide](docs/package-system.md).\n\n## First-party application source
 
 Each application now has its own source module under `applications/<id>/`. The desktop host loads these modules through the shared app runtime; it no longer owns the individual app renderers. CAIRN's shell engine is packaged under `applications/cairn/`. See [application module architecture](docs/application-modules.md).
 
