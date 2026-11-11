@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate and display a SAPP v1 package."""
+"""Structurally validate and display SAPP v1/v2 executable containers."""
 from __future__ import annotations
 import argparse
 import json
@@ -39,6 +39,8 @@ def inspect(data: bytes):
             raise FormatError("signature block is not valid UTF-8 JSON") from exc
         if not isinstance(signature, dict) or signature.get("format") != "SAND-SAPP-SIGNATURE" or signature.get("version") != 1 or signature.get("algorithm") != "Ed25519":
             raise FormatError("unsupported SAPP v2 signature block")
+        if not isinstance(signature.get("publisherCertificate"), dict) or not isinstance(signature.get("signature"), str):
+            raise FormatError("SAPP v2 signature block is missing its publisher certificate or signature")
         if sig_off < meta_off + meta_size:
             raise FormatError("signature block overlaps metadata")
     if not 1 <= seg_count <= 8 or reloc_count > 256:
