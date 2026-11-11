@@ -4,6 +4,7 @@ import json,pathlib,sys
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 CORE={"cairn","locus","quanta","cadence","keystone"}
 EXTENDED={"pulse","glyph","prism","morrow","crate","chronos","spectra","beacon"}
+CAPABILITIES={"storage.read","storage.write","storage.delete","settings.read","settings.write","ipc.send","ipc.receive","platform.info.read","platform.window.create","platform.files.read","platform.files.write","platform.process.read","platform.device.read","platform.network.read"}
 def validate():
  errors=[];seen=set()
  for app in sorted(CORE|EXTENDED):
@@ -15,7 +16,10 @@ def validate():
   if missing:errors.append(f"{app}: missing {', '.join(sorted(missing))}");continue
   if d["id"]!=app:errors.append(f"{app}: id mismatch")
   if d["id"] in seen:errors.append(f"duplicate id: {d['id']}")
-  seen.add(d["id"]);phase="core" if app in CORE else "extended"
+  seen.add(d["id"]);caps=d.get("capabilities",[])
+  if not isinstance(caps,list) or any(not isinstance(c,str) or c not in CAPABILITIES for c in caps):errors.append(f"{app}: invalid runtime capabilities")
+  if len(caps)!=len(set(caps)):errors.append(f"{app}: duplicate runtime capabilities")
+  phase="core" if app in CORE else "extended"
   if d["phase"]!=phase:errors.append(f"{app}: expected phase {phase}")
   expected_status="host-prototype" if phase=="core" else "planned"
   if d["status"]!=expected_status:errors.append(f"{app}: expected status {expected_status}")
