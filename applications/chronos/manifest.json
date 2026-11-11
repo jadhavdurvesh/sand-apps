@@ -2,18 +2,17 @@
   "id": "chronos",
   "name": "CHRONOS",
   "version": "0.1.0",
-  "description": "Clock, alarms, timers and stopwatch.",
-  "phase": "extended",
-  "status": "planned",
-  "prototype": false,
-  "entrypoint": null,
-  "target": "native-sand",
+  "description": "Local clock, stopwatch, countdown timer and alarms.",
+  "phase": "core",
+  "status": "host-prototype",
+  "prototype": true,
+  "entrypoint": "../../preview/index.html",
+  "target": "host-preview",
   "sapp": "pending-abi",
   "capabilities": [
     "storage.read",
     "storage.write",
-    "settings.read",
-    "settings.write",
+    "platform.notifications.create",
     "platform.window.create"
   ]
 }
