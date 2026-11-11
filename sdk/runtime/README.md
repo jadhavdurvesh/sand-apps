@@ -28,7 +28,7 @@ app.stop();
 - IPC: host-mediated topic messaging; sender and receiver need separate grants.
 - Platform bridge: asynchronous versioned requests through an injected adapter.
 
-Desktop event subscriptions use `runtime.onPlatformEvent(topic, handler)` and require `platform.desktop.events`.
+The shared UI helpers are documented in [the SDK UI kit](../ui/README.md). Load `sdk/ui/app-kit.js` after the runtime and before first-party modules.\n\nDesktop event subscriptions use `runtime.onPlatformEvent(topic, handler)` and require `platform.desktop.events`.
 
 The desktop host adapter is documented in [desktop services](../../docs/desktop-services.md). It currently provides logical windows, app-scoped notifications, desktop events and an in-memory virtual filesystem.
 
