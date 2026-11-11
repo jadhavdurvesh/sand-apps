@@ -28,7 +28,7 @@ Then open `http://localhost:8000/preview/`. See [preview usage and shortcuts](do
 
 ## FORGE and SAND packages
 
-FORGE manages installed applications and user-approved capabilities. SANDPKG v1 packages can be built, inspected and validated with `tools/sandpkg.py`; `templates/app/` contains a starter. Third-party packages are validated and stored but intentionally not executable until native isolation, trusted signatures and a stable ABI exist. See [the package system guide](docs/package-system.md).
+FORGE manages installed applications and user-approved capabilities. SANDPKG v1 packages can be built, inspected and validated with `tools/sandpkg.py`; `templates/app/` contains a starter. Third-party packages are validated and stored but intentionally not executable until native isolation, trusted signatures and a stable ABI exist. See [the package system guide](docs/package-system.md) and [SAND Trust & Code Integrity](docs/trust-and-signing.md) for publisher certificates and Ed25519 package signing.
 
 ## First-party application source
 
