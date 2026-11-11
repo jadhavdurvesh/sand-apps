@@ -18,7 +18,7 @@ def validate():
   if d["id"] in seen:errors.append(f"duplicate id: {d['id']}")
   seen.add(d["id"]);caps=d.get("capabilities",[])
   if not isinstance(caps,list) or any(not isinstance(c,str) or c not in CAPABILITIES for c in caps):errors.append(f"{app}: invalid runtime capabilities")
-  if len(caps)!=len(set(caps)):errors.append(f"{app}: duplicate runtime capabilities")
+  if isinstance(caps,list) and all(isinstance(c,str) for c in caps) and len(caps)!=len(set(caps)):errors.append(f"{app}: duplicate runtime capabilities")
   phase="core" if app in CORE else "extended"
   if d["phase"]!=phase:errors.append(f"{app}: expected phase {phase}")
   expected_status="host-prototype" if phase=="core" else "planned"
