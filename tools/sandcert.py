@@ -12,7 +12,7 @@ import re
 import subprocess
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 FORMAT = "SANDPKG"
@@ -143,7 +143,7 @@ def publisher_issue(args):
             "publisherId": args.publisher_id, "subject": args.subject,
             "publicKeyPem": public_bytes.decode("ascii"),
             "keyId": key_id(public_bytes), "issuerKeyId": authority["keyId"],
-            "notBefore": now.isoformat(), "notAfter": (now.replace(year=now.year + args.years)).isoformat(),
+            "notBefore": now.isoformat(), "notAfter": (now + timedelta(days=365 * args.years)).isoformat(),
             "keyUsage": ["codeSigning"]}
     cert["issuerSignature"] = base64.b64encode(sign_bytes(root_key, canonical(cert))).decode("ascii")
     write_json(out / "publisher-cert.json", cert)
@@ -187,7 +187,7 @@ def sign_package(args):
     pub = cert.get("publicKeyPem", "").encode("ascii")
     if key_id(pub) != cert.get("keyId"):
         raise TrustError("publisher certificate public key fingerprint mismatch")
-    signature = sign_bytes(args.private_key, canonical(unsigned_package(package)))
+    if public_pem(args.private_key) != pub:\n        raise TrustError("publisher private key does not match the certificate public key")\n    signature = sign_bytes(args.private_key, canonical(unsigned_package(package)))
     package["signature"] = {"algorithm": ALGORITHM, "publisherCertificate": cert,
                             "value": base64.b64encode(signature).decode("ascii")}
     write_json(args.output, package)
