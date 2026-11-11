@@ -16,7 +16,7 @@ app.requestService("window","create",{title:"Example",width:800,height:600},"pla
 ## Supported service operations
 
 - `system.info`
-- `window.create/focus/minimize/maximize/list/destroy`
+- `window.create/focus/minimize/maximize/restore/list/destroy`
 - `notifications.create/list/dismiss`
 - `files.mkdir/write/read/list/stat/delete`
 - `onPlatformEvent(topic, listener)` for `desktop.*` notifications
