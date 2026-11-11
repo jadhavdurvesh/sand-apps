@@ -21,9 +21,9 @@ python3 -m http.server 8000
 
 Then open `http://localhost:8000/preview/`. See [preview usage and shortcuts](docs/preview-usage.md) and [the full app catalogue](docs/application-catalog.md).
 
-## Extended suite (catalogued)
+## Extended application prototypes
 
-**PULSE** (system monitor), **PRISM** (image viewer), **CRATE** (archive manager), **SPECTRA** (media player), **BEACON** (network manager).
+**PULSE** (host monitor), **PRISM** (image viewer), **CRATE** (SANDPACK bundles), **SPECTRA** (local media player), **BEACON** (network status).
 
 ## First-party application source
 
