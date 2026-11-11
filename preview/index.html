@@ -7,4 +7,10 @@
 <aside id="notification-center" class="notification-center" hidden><div class="notification-heading"><div><span class="eyebrow">DESKTOP</span><h2>Notifications</h2></div><button class="panel-close" onclick="document.querySelector('#notification-center').hidden=true" aria-label="Close notifications">×</button></div><div id="notification-list"></div></aside>
 <div id="desktop-toast" class="desktop-toast" role="status" hidden></div>
 <nav id="dock" class="desktop-dock" aria-label="Application dock"><button data-dock-app="cairn" title="CAIRN — Terminal"><span class="dock-icon">›_</span><small>CAIRN</small><i></i></button><button data-dock-app="locus" title="LOCUS — Files"><span class="dock-icon">▤</span><small>LOCUS</small><i></i></button><button data-dock-app="quanta" title="QUANTA — Calculator"><span class="dock-icon">∑</span><small>QUANTA</small><i></i></button><button data-dock-app="cadence" title="CADENCE — Tasks"><span class="dock-icon">✓</span><small>CADENCE</small><i></i></button><button data-dock-app="keystone" title="KEYSTONE — Settings"><span class="dock-icon">⚙</span><small>KEYSTONE</small><i></i></button></nav>
-<script src="../sdk/runtime/sand-runtime.js"></script><script src="../sdk/runtime/desktop-services.js"></script><script src="cairn.js"></script><script src="app.js"></script></body></html>
+<script src="../sdk/runtime/sand-runtime.js"></script><script src="../sdk/runtime/desktop-services.js"></script><script src="cairn.js"></script>
+<script src="../applications/cairn/app.js"></script>
+<script src="../applications/locus/app.js"></script>
+<script src="../applications/quanta/app.js"></script>
+<script src="../applications/cadence/app.js"></script>
+<script src="../applications/keystone/app.js"></script>
+<script src="app.js"></script></body></html>
