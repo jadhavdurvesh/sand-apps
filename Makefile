@@ -4,7 +4,7 @@ LD ?= ld
 BUILD := build
 APP := hello
 
-.PHONY: all tools hello apps test test-js test-trust clean
+.PHONY: all tools hello apps test test-js test-trust test-sapp-v2 clean
 all: tools apps hello
 
 tools:
@@ -31,6 +31,9 @@ test:
 
 test-trust:
 	$(PYTHON) -m unittest discover -s tests -p 'test_sandcert.py' -v
+
+test-sapp-v2:
+	$(PYTHON) -m unittest discover -s tests -p 'test_sapp_v2.py' -v
 
 test-js:
 	node --test tests/test_cairn.cjs tests/test_runtime.cjs tests/test_desktop.cjs tests/test_app_modules.cjs tests/test_ui.cjs tests/test_package_manager.cjs tests/test_sdk_types.cjs
