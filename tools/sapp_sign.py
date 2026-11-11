@@ -70,8 +70,10 @@ def main():
         cert = json.loads(Path(args.certificate).read_text(encoding="utf-8"))
         if cert.get("format") != "SAND-PUBLISHER-CERT" or cert.get("version") != 1 or cert.get("keyUsage") != ["codeSigning"]:
             raise SignError("invalid publisher code-signing certificate")
-        if not isinstance(cert.get("publicKeyPem"), str) or not cert.get("keyId") or not cert.get("issuerSignature"):
+        if not isinstance(cert.get("publicKeyPem"), str) or not isinstance(cert.get("keyId"), str) or not isinstance(cert.get("issuerSignature"), str):
             raise SignError("publisher certificate is incomplete")
+        if not isinstance(cert.get("notBefore"), str) or not isinstance(cert.get("notAfter"), str):
+            raise SignError("publisher certificate validity period is malformed")
         if public_from_private(args.private_key) != cert["publicKeyPem"].encode("ascii"):
             raise SignError("publisher private key does not match certificate")
         now = datetime.now(timezone.utc)
