@@ -1,4 +1,4 @@
-# SAND Application Runtime
+# SAND Application Runtime and Desktop Services
 
 Version **0.1.0** · ABI **sand.app-runtime/0.1**
 
@@ -27,6 +27,10 @@ app.stop();
 - Settings: typed schemas, defaults, enums and change events.
 - IPC: host-mediated topic messaging; sender and receiver need separate grants.
 - Platform bridge: asynchronous versioned requests through an injected adapter.
+
+Desktop event subscriptions use `runtime.onPlatformEvent(topic, handler)` and require `platform.desktop.events`.
+
+The desktop host adapter is documented in [desktop services](../../docs/desktop-services.md). It currently provides logical windows, app-scoped notifications, desktop events and an in-memory virtual filesystem.
 
 ## Security
 

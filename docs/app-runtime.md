@@ -9,6 +9,7 @@
 - Storage and settings are namespaced by app ID.
 - IPC sender requires \`ipc.send\`; receiver requires \`ipc.receive\`.
 - Platform calls require a declared and granted capability and an injected native adapter.
+- Desktop event subscriptions require `platform.desktop.events` and are released when the app stops.
 
 ## APIs
 
