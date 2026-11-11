@@ -1,7 +1,7 @@
 "use strict";
 const test=require("node:test");
 const assert=require("node:assert/strict");
-const Cairn=require("../preview/cairn.js");
+const Cairn=require("../applications/cairn/shell.js");
 test("quoted arguments",()=>assert.deepEqual(Cairn.tokenize('write "hello world.txt" "a note"'),["write","hello world.txt","a note"]));
 test("unclosed quotes rejected",()=>assert.throws(()=>Cairn.tokenize('echo "unfinished')));
 test("path normalization",()=>assert.equal(Cairn.normalizePath("/home/guest/Documents","../Desktop"),"/home/guest/Desktop"));
