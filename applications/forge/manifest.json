@@ -1,0 +1,15 @@
+{
+  "id": "forge",
+  "name": "FORGE",
+  "version": "0.1.0",
+  "description": "Manage installed SAND applications, review permissions and install validated local packages.",
+  "phase": "core",
+  "status": "host-prototype",
+  "prototype": true,
+  "entrypoint": "app.js",
+  "target": "host-preview",
+  "sapp": "pending-abi",
+  "capabilities": [
+    "platform.window.create"
+  ]
+}
