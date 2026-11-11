@@ -1,1 +1,19 @@
-{"id":"cadence","name":"CADENCE","version":"0.1.0","description":"Task manager with completion tracking and local preview persistence.","phase":"core","status":"host-prototype","prototype":true,"entrypoint":"../../preview/index.html","target":"host-preview","sapp":"pending-abi"}
+{
+  "id": "cadence",
+  "name": "CADENCE",
+  "version": "0.1.0",
+  "description": "Task manager with completion tracking and local preview persistence.",
+  "phase": "core",
+  "status": "host-prototype",
+  "prototype": true,
+  "entrypoint": "../../preview/index.html",
+  "target": "host-preview",
+  "sapp": "pending-abi",
+  "capabilities": [
+    "storage.read",
+    "storage.write",
+    "settings.read",
+    "settings.write",
+    "platform.window.create"
+  ]
+}

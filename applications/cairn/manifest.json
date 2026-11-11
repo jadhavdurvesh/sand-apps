@@ -1,1 +1,16 @@
-{"id":"cairn","name":"CAIRN","version":"0.7.0","description":"Keyboard-first SAND command environment with searchable registry, manuals and native command namespace.","phase":"core","status":"host-prototype","prototype":true,"entrypoint":"../../preview/index.html","target":"host-preview","sapp":"pending-abi"}
+{
+  "id": "cairn",
+  "name": "CAIRN",
+  "version": "0.7.0",
+  "description": "Keyboard-first SAND command environment with searchable registry, manuals and native command namespace.",
+  "phase": "core",
+  "status": "host-prototype",
+  "prototype": true,
+  "entrypoint": "../../preview/index.html",
+  "target": "host-preview",
+  "sapp": "pending-abi",
+  "capabilities": [
+    "storage.read",
+    "storage.write"
+  ]
+}

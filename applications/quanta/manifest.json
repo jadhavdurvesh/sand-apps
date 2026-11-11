@@ -1,1 +1,17 @@
-{"id":"quanta","name":"QUANTA","version":"0.1.0","description":"Keyboard-friendly arithmetic calculator.","phase":"core","status":"host-prototype","prototype":true,"entrypoint":"../../preview/index.html","target":"host-preview","sapp":"pending-abi"}
+{
+  "id": "quanta",
+  "name": "QUANTA",
+  "version": "0.1.0",
+  "description": "Keyboard-friendly arithmetic calculator.",
+  "phase": "core",
+  "status": "host-prototype",
+  "prototype": true,
+  "entrypoint": "../../preview/index.html",
+  "target": "host-preview",
+  "sapp": "pending-abi",
+  "capabilities": [
+    "storage.read",
+    "storage.write",
+    "platform.window.create"
+  ]
+}
