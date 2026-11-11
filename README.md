@@ -26,7 +26,11 @@ Then open `http://localhost:8000/preview/`. See [preview usage and shortcuts](do
 
 **PULSE** (host monitor), **PRISM** (image viewer), **CRATE** (SANDPACK bundles), **SPECTRA** (local media player), **BEACON** (network status).
 
-## FORGE and SAND packages\n\nFORGE manages installed applications and user-approved capabilities. SANDPKG v1 packages can be built, inspected and validated with `tools/sandpkg.py`; `templates/app/` contains a starter. Third-party packages are validated and stored but intentionally not executable until native isolation, trusted signatures and a stable ABI exist. See [the package system guide](docs/package-system.md).\n\n## First-party application source
+## FORGE and SAND packages
+
+FORGE manages installed applications and user-approved capabilities. SANDPKG v1 packages can be built, inspected and validated with `tools/sandpkg.py`; `templates/app/` contains a starter. Third-party packages are validated and stored but intentionally not executable until native isolation, trusted signatures and a stable ABI exist. See [the package system guide](docs/package-system.md).
+
+## First-party application source
 
 Each application now has its own source module under `applications/<id>/`. The desktop host loads these modules through the shared app runtime; it no longer owns the individual app renderers. CAIRN's shell engine is packaged under `applications/cairn/`. See [application module architecture](docs/application-modules.md).
 
@@ -49,7 +53,7 @@ The native smoke-test produces `build/hello.elf` and `build/hello.sapp`.
 
 ## ABI boundary
 
-SAPP v1 is an early executable container, not a stable application ABI. The current kernel exposes only a test syscall and does not provide public terminal I/O, filesystem, windowing, process, networking or device APIs. All thirteen apps are interactive host-side prototypes. Browser APIs expose only limited metrics, local user-selected files and browser connectivity; they do not provide native disk, process, network configuration or device access. Native integration follows only after relevant versioned OS services exist.
+SAPP v1 is an early executable container, not a stable application ABI. The current kernel exposes only a test syscall and does not provide public terminal I/O, filesystem, windowing, process, networking or device APIs. All fourteen apps are interactive host-side prototypes. Browser APIs expose only limited metrics, local user-selected files and browser connectivity; they do not provide native disk, process, network configuration or device access. Native integration follows only after relevant versioned OS services exist.
 
 Read [docs/abi-compatibility.md](docs/abi-compatibility.md) and [FORMAT.md](FORMAT.md) before changing package generation.
 
