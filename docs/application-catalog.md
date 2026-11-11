@@ -1,6 +1,6 @@
 # SAND application catalogue
 
-## Phase 1 — Core five
+## Core eight — implemented host prototypes
 
 | App | Responsibility |
 |---|---|
@@ -9,10 +9,13 @@
 | **QUANTA** | Calculator |
 | **CADENCE** | Task manager |
 | **KEYSTONE** | System settings |
+| **GLYPH** | Text and code editor for its private file workspace |
+| **MORROW** | Private notes and personal workspace |
+| **CHRONOS** | Clock, alarms, timers and stopwatch |
 
-These five are the active implementation milestone and have interactive host-side prototypes in `preview/`.
+All eight have independent application modules and interactive host-side prototypes in `preview/`.
 
-## Phase 2 — Extended suite
+## Extended suite — catalogued, not yet implemented
 
 | App | Responsibility |
 |---|---|
@@ -27,7 +30,7 @@ These five are the active implementation milestone and have interactive host-sid
 
 ## Delivery rules
 
-1. Phase 1 receives implementation effort first. Phase 2 is catalogued, not represented as implemented.
+1. The eight core apps are implemented as host-side prototypes. Extended apps are catalogued, not represented as implemented.
 2. Every app has a stable ID and manifest.
 3. Host prototypes are development previews, not native SAND OS applications.
 4. Native integration requires documented, versioned OS services and a stable application ABI.
