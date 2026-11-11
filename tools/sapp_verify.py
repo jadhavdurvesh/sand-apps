@@ -96,6 +96,8 @@ def verify(path, trust_path):
         raise VerifyError("missing or invalid publisher certificate")
     if cert.get("keyUsage") != ["codeSigning"]:
         raise VerifyError("certificate is not authorized for code signing")
+    if not isinstance(cert.get("publicKeyPem"), str) or not isinstance(cert.get("issuerKeyId"), str):
+        raise VerifyError("publisher certificate is missing key material or issuer identity")
     now = datetime.now(timezone.utc)
     if not parse_time(cert.get("notBefore")) <= now <= parse_time(cert.get("notAfter")):
         raise VerifyError("publisher certificate is expired or not yet valid")
@@ -103,12 +105,14 @@ def verify(path, trust_path):
     if fingerprint(pub) != cert.get("keyId"):
         raise VerifyError("publisher public-key fingerprint mismatch")
     trust = json.loads(Path(trust_path).read_text(encoding="utf-8"))
-    if not isinstance(trust, dict) or trust.get("format") != "SAND-TRUST-STORE" or not isinstance(trust.get("roots"), list):
+    if not isinstance(trust, dict) or trust.get("format") != "SAND-TRUST-STORE" or not isinstance(trust.get("roots"), list) or any(not isinstance(item, dict) for item in trust["roots"]):
         raise VerifyError("invalid SAND trust store")
     root = next((item for item in trust["roots"] if item.get("keyId") == cert.get("issuerKeyId") and item.get("status") == "trusted"), None)
     if not root:
         raise VerifyError("publisher certificate chains to no trusted SAND root")
-    root_pem = root.get("publicKeyPem", "").encode("ascii")
+    if not isinstance(root.get("publicKeyPem"), str):
+        raise VerifyError("trusted root has no public key")
+    root_pem = root["publicKeyPem"].encode("ascii")
     if fingerprint(root_pem) != root.get("keyId"):
         raise VerifyError("trusted root fingerprint mismatch")
     cert_unsigned = dict(cert)
