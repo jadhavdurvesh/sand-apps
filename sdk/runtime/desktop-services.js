@@ -11,9 +11,9 @@ function fail(code,message){throw new DesktopError(code,message)}
 function obj(v){return v!==null&&typeof v==="object"&&!Array.isArray(v)}
 function clone(v){return JSON.parse(JSON.stringify(v))}
 function eventHub(){const listeners=new Map();return {on(topic,fn){if(typeof topic!=="string"||typeof fn!=="function")fail("INVALID_EVENT","Invalid event subscription");if(!listeners.has(topic))listeners.set(topic,new Set());const set=listeners.get(topic);set.add(fn);let live=true;return()=>{if(!live)return false;live=false;set.delete(fn);if(!set.size)listeners.delete(topic);return true}},emit(topic,payload){const set=listeners.get(topic);if(!set)return 0;let n=0;for(const fn of Array.from(set)){fn(clone(payload));n++}return n},clear(){listeners.clear()}}}
-function pathOf(input){if(typeof input!=="string"||!input||input.includes("\0")||input.length>512)fail("INVALID_PATH","A valid absolute virtual path is required");const raw=input.startsWith("/")?input:"/"+input;const parts=raw.split("/").filter(Boolean);if(parts.some(p=>p==="."||p===".."))fail("INVALID_PATH","Relative path segments are not allowed");return "/"+parts.join("/")}
+function pathOf(input){if(typeof input!=="string"||!input.startsWith("/")||input.includes("\0")||input.length>512)fail("INVALID_PATH","A valid absolute virtual path is required");const raw=input;const parts=raw.split("/").filter(Boolean);if(parts.some(p=>p==="."||p===".."))fail("INVALID_PATH","Relative path segments are not allowed");return "/"+parts.join("/")}
 function createDesktopHost(options={}){
- if(!obj(options))fail("INVALID_OPTIONS","Desktop host options must be an object");
+ if(!obj(options))fail("INVALID_OPTIONS","Desktop host options must be an object");if(options.catalog!==undefined&&!Array.isArray(options.catalog))fail("INVALID_CATALOG","Desktop app catalogue must be an array");
  const catalog=new Map(),grantTable=new Map(),files=new Map(),windows=new Map(),notifications=new Map(),hub=eventHub();
  const storage=options.storage||Sand.createMemoryStorageAdapter();
  const appHost=Sand.createHost({storage});
@@ -53,7 +53,7 @@ function createDesktopHost(options={}){
   if(key==="notifications.dismiss"){const n=notifications.get(p.notificationId);if(!n||n.appId!==req.appId)fail("NOTIFICATION_NOT_FOUND","Notification does not belong to this application");notifications.delete(n.id);hub.emit("desktop.notification.dismissed",{appId:req.appId,notificationId:n.id});return {ok:true}}
   if(key.startsWith("files.")){
    const fs=appFiles(req.appId),path=pathOf(p.path);
-   if(key==="files.write"){if(typeof p.content!=="string"||p.content.length>1048576)fail("INVALID_CONTENT","File content must be text no larger than 1 MiB");if(path==="/")fail("INVALID_PATH","Cannot write the filesystem root");const parent=path.slice(0,path.lastIndexOf("/"))||"/";if(!fs.has(parent))fail("DIRECTORY_NOT_FOUND","Parent directory does not exist");if(fs.get(parent).type!=="directory")fail("NOT_A_DIRECTORY","Parent path is not a directory");fs.set(path,{type:"file",content:p.content,modified:Date.now()});hub.emit("desktop.files.changed",{appId:req.appId,path,operation:"write"});return fileInfo(path,fs.get(path))}
+   if(key==="files.write"){if(typeof p.content!=="string"||new TextEncoder().encode(p.content).length>1048576)fail("INVALID_CONTENT","File content must be text no larger than 1 MiB");if(path==="/")fail("INVALID_PATH","Cannot write the filesystem root");if(fs.has(path)&&fs.get(path).type!=="file")fail("IS_DIRECTORY","Cannot replace a directory with a file");const parent=path.slice(0,path.lastIndexOf("/"))||"/";if(!fs.has(parent))fail("DIRECTORY_NOT_FOUND","Parent directory does not exist");if(fs.get(parent).type!=="directory")fail("NOT_A_DIRECTORY","Parent path is not a directory");fs.set(path,{type:"file",content:p.content,modified:Date.now()});hub.emit("desktop.files.changed",{appId:req.appId,path,operation:"write"});return fileInfo(path,fs.get(path))}
    if(key==="files.mkdir"){if(fs.has(path))fail("ALREADY_EXISTS","Path already exists");const parent=path.slice(0,path.lastIndexOf("/"))||"/";if(!fs.has(parent)||fs.get(parent).type!=="directory")fail("DIRECTORY_NOT_FOUND","Parent directory does not exist");fs.set(path,{type:"directory",modified:Date.now()});hub.emit("desktop.files.changed",{appId:req.appId,path,operation:"mkdir"});return fileInfo(path,fs.get(path))}
    if(key==="files.read"){const f=fs.get(path);if(!f)fail("FILE_NOT_FOUND","File not found");if(f.type!=="file")fail("IS_DIRECTORY","Cannot read a directory");return f.content}
    if(key==="files.stat"){const f=fs.get(path);if(!f)fail("FILE_NOT_FOUND","Path not found");return fileInfo(path,f)}
@@ -69,7 +69,7 @@ function createDesktopHost(options={}){
   stop(id,reason){const ok=appHost.stop(id,reason);if(ok){grantTable.delete(id);for(const [wid,w] of windows)if(w.appId===id)windows.delete(wid);for(const [nid,n] of notifications)if(n.appId===id)notifications.delete(nid);hub.emit("desktop.app.stopped",{appId:id})}return ok},
   listApps:()=>appHost.listApps(),
   on:(topic,fn)=>hub.on(topic,fn),
-  emit(topic,payload){if(typeof topic!=="string"||!topic.startsWith("desktop."))fail("INVALID_EVENT","Only desktop.* events may be emitted");hub.emit(topic,Object.assign({source:"desktop-host"},clone(payload||{})));return true},
+  emit(topic,payload){if(typeof topic!=="string"||!topic.startsWith("desktop."))fail("INVALID_EVENT","Only desktop.* events may be emitted");const safe=clone(payload||{});delete safe.appId;delete safe.source;hub.emit(topic,Object.assign(safe,{source:"desktop-host"}));return true},
   listWindows:()=>Array.from(windows.values()).map(clone),
   listNotifications:()=>Array.from(notifications.values()).map(clone),
   get count(){return appHost.count}
