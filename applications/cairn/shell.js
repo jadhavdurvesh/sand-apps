@@ -160,6 +160,7 @@ function run(line,context={}){
    all.push(...finalResult.lines);
   }
   previousOperator=group.operator;
+  lastExit=exitCode;
  }
  lastExit=exitCode;
  lastOutput=all.map(x=>x.text).join("\n");
@@ -170,6 +171,7 @@ function complete(input){const text=String(input||""),parts=text.split(/\s+/),pr
 const api={run,registerCommand,registerAlias,snapshot,complete,get cwd(){return cwd},get history(){return history.slice()},get commands(){return Array.from(commandRegistry.keys())},get registry(){return Array.from(commandRegistry.values()).map(meta=>Object.assign({},meta))},getCommand(name){const meta=commandRegistry.get(name);return meta?Object.assign({},meta):null},get capabilities(){return {granted:Array.from(grantedCapabilities),catalogue:Object.assign({},CAPABILITY_CATALOGUE),has:hasCapability}},get bridge(){return {abi:PLATFORM_BRIDGE_ABI,connected:!!platform}},get environment(){return Object.assign({},environment)},get aliases(){return Object.fromEntries(aliases)},get jobs(){return Array.from(jobs.values()).map(j=>Object.assign({},j))},get lastExit(){return lastExit},get lastOutput(){return lastOutput},getPath(path){return resolve(fs,normalizePath(cwd,path))}};
 return api}
 function parseSegments(tokens){
+ if(tokens.length&&["|",";","&&","||"].includes(tokens[tokens.length-1]))throw new Error("Missing command after shell operator.");
  const groups=[];let current=[],pipeline=[];
  const finishCommand=()=>{if(!current.length)throw new Error("Missing command near shell operator.");pipeline.push(current);current=[]};
  const finishGroup=operator=>{finishCommand();groups.push({pipeline:pipeline.slice(),operator:operator==="&"?";":operator,background:operator==="&"});pipeline=[]};
