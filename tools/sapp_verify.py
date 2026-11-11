@@ -23,9 +23,9 @@ def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
 
 
-def openssl(*args):
+def openssl(*args, input_bytes=None):
     try:
-        result = subprocess.run(["openssl", *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(["openssl", *args], input=input_bytes, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except FileNotFoundError as exc:
         raise VerifyError("OpenSSL 3.x is required") from exc
     if result.returncode:
