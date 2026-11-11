@@ -11,6 +11,7 @@
 | **KEYSTONE** | System settings |
 | **GLYPH** | Text and code editor for its private file workspace |
 | **MORROW** | Private notes and personal workspace |
+| **CHRONOS** | Clock, alarms, timers and stopwatch |
 
 All thirteen have independent application modules and interactive host-side prototypes in `preview/`.
 
@@ -21,7 +22,6 @@ All thirteen have independent application modules and interactive host-side prot
 | **PULSE** | Browser-visible runtime, storage estimate and host information; native CPU/process metrics await kernel services |
 | **PRISM** | Local image viewer with zoom, rotation and dimensions |
 | **CRATE** | SANDPACK bundle creator, inspector and extractor (JSON-based, not ZIP) |
-| **CHRONOS** | Clock, alarms, timers and stopwatch |
 | **SPECTRA** | Local audio/video player and queue |
 | **BEACON** | Read-only browser network status; no native configuration |
 
