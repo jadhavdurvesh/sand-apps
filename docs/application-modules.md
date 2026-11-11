@@ -1,6 +1,6 @@
 # First-party application modules
 
-The eight core SAND apps are maintained as independent source modules under `applications/<app-id>/app.js`.
+All thirteen SAND apps are maintained as independent source modules under `applications/<app-id>/app.js`.
 
 ## Host integration
 
@@ -27,7 +27,7 @@ Modules must not access another app's runtime or storage. They must use the inje
 | KEYSTONE | `applications/keystone/app.js` | Theme, accent and reduced-motion preferences using typed runtime settings |
 | GLYPH | `applications/glyph/app.js` | Browse its app-private file workspace, create, edit, search and save UTF-8 text files |
 | MORROW | `applications/morrow/app.js` | Persistent private notes, search, quick capture and editing |
-| CHRONOS | `applications/chronos/app.js` | Local clock, stopwatch, countdown timer and persistent alarm definitions; notifications run while the preview app is open |
+| CHRONOS | `applications/chronos/app.js` | Local clock, stopwatch, countdown timer and persistent alarm definitions; notifications run while the preview app is open |\n| PULSE | `applications/pulse/app.js` | Browser-reported runtime, app sessions, JavaScript heap and origin storage estimate; native metrics unavailable |\n| PRISM | `applications/prism/app.js` | Local image import, image dimensions, zoom, rotation and cleanup |\n| CRATE | `applications/crate/app.js` | Build, inspect and extract SANDPACK v1 JSON bundles with size and entry limits |\n| SPECTRA | `applications/spectra/app.js` | Local audio/video playback, queue, seeking, volume and track changes |\n| BEACON | `applications/beacon/app.js` | Online/offline state and optional browser Network Information API fields |
 
 ## Verification
 
