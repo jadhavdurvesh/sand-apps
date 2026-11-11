@@ -62,6 +62,11 @@ def main():
         source = Path(args.input).read_bytes()
         if len(source) < HEADER.size:
             raise SignError("input is shorter than the SAPP header")
+        from importlib.util import module_from_spec, spec_from_file_location
+        spec = spec_from_file_location("sapp_inspect", Path(__file__).with_name("sapp_inspect.py"))
+        inspector = module_from_spec(spec)
+        spec.loader.exec_module(inspector)
+        inspector.inspect(source)
         fields = list(HEADER.unpack_from(source))
         if fields[0] != b"SAPP" or fields[1] != 1:
             raise SignError("input must be an unsigned SAPP v1 image")
