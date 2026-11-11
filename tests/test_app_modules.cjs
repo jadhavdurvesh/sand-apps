@@ -5,12 +5,13 @@ const fs=require("node:fs");
 const path=require("node:path");
 const vm=require("node:vm");
 const root=path.resolve(__dirname,"..");
-const apps=["cairn","locus","quanta","cadence","keystone"];
+const apps=["cairn","locus","quanta","cadence","keystone","glyph","morrow","chronos"];
 
 test("first-party application modules parse and register independently",()=>{
  const context={console, setTimeout, clearTimeout};
  context.window=context;
  context.document={};
+ context.SandUI=require("../sdk/ui/app-kit.js");
  context.localStorage={getItem(){return null},setItem(){},removeItem(){}};
  vm.createContext(context);
  for(const id of apps){
@@ -29,4 +30,5 @@ test("desktop host dispatches to application modules, not inline legacy renderer
  assert.doesNotMatch(source,/render:terminal|render:files|render:calculator|render:tasks|render:settings/);
  const html=fs.readFileSync(path.join(root,"preview","index.html"),"utf8");
  for(const id of apps)assert.ok(html.includes("../applications/"+id+"/app.js"),id+" script included");
+ assert.ok(html.includes("../sdk/ui/app-kit.js"),"shared UI kit loaded before apps");
 });
