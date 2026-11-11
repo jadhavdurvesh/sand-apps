@@ -4,5 +4,5 @@ spec=importlib.util.spec_from_file_location("validate_apps",ROOT/"tools"/"valida
 validator=importlib.util.module_from_spec(spec);spec.loader.exec_module(validator)
 class AppCatalogueTests(unittest.TestCase):
  def test_manifests(self):self.assertEqual(validator.validate(),[])
- def test_phase_counts(self):self.assertEqual(len(validator.CORE),5);self.assertEqual(len(validator.EXTENDED),8)
+ def test_phase_counts(self):self.assertEqual(len(validator.CORE),9);self.assertEqual(len(validator.EXTENDED),5)
 if __name__=="__main__":unittest.main()

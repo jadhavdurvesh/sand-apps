@@ -2,8 +2,8 @@
 """Validate first-party application manifests and phase boundaries."""
 import json,pathlib,sys
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-CORE={"cairn","locus","quanta","cadence","keystone"}
-EXTENDED={"pulse","glyph","prism","morrow","crate","chronos","spectra","beacon"}
+CORE={"cairn","locus","quanta","cadence","keystone","glyph","morrow","chronos","forge"}
+EXTENDED={"pulse","prism","crate","spectra","beacon"}
 CAPABILITIES={"storage.read","storage.write","storage.delete","settings.read","settings.write","ipc.send","ipc.receive","platform.info.read","platform.window.create","platform.files.read","platform.files.write","platform.process.read","platform.device.read","platform.network.read","platform.notifications.create","platform.desktop.events"}
 def validate():
  errors=[];seen=set()
@@ -21,11 +21,11 @@ def validate():
   if isinstance(caps,list) and all(isinstance(c,str) for c in caps) and len(caps)!=len(set(caps)):errors.append(f"{app}: duplicate runtime capabilities")
   phase="core" if app in CORE else "extended"
   if d["phase"]!=phase:errors.append(f"{app}: expected phase {phase}")
-  expected_status="host-prototype" if phase=="core" else "planned"
+  expected_status="host-prototype"
   if d["status"]!=expected_status:errors.append(f"{app}: expected status {expected_status}")
-  if d["prototype"]!=(phase=="core"):errors.append(f"{app}: prototype flag mismatch")
+  if d["prototype"] is not True:errors.append(f"{app}: host prototype flag mismatch")
  return errors
 if __name__=="__main__":
  errors=validate()
  if errors:print("\n".join(errors),file=sys.stderr);raise SystemExit(1)
- print(f"Validated {len(CORE)} core apps and {len(EXTENDED)} planned extended apps.")
+ print(f"Validated {len(CORE)} core apps and {len(EXTENDED)} extended host prototypes.")

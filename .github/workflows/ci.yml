@@ -24,11 +24,11 @@ jobs:
       - name: Check preview JavaScript syntax
         run: |
           node --check preview/app.js
-          node --check preview/cairn.js
+          node --check applications/cairn/shell.js
       - name: Build SAND Hello package
         run: make clean all
       - name: Upload SAPP artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sand-hello-sapp
+          name: sand-hello-sapp-v1-unsigned
           path: build/hello.sapp
