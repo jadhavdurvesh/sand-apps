@@ -66,6 +66,11 @@ def parse_time(value):
 
 def verify(path, trust_path):
     data = Path(path).read_bytes()
+    from importlib.util import module_from_spec, spec_from_file_location
+    spec = spec_from_file_location("sapp_inspect", Path(__file__).with_name("sapp_inspect.py"))
+    inspector = module_from_spec(spec)
+    spec.loader.exec_module(inspector)
+    inspector.inspect(data)
     if len(data) < HEADER.size:
         raise VerifyError("file is shorter than SAPP header")
     fields = HEADER.unpack_from(data)
