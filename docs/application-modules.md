@@ -20,7 +20,7 @@ Modules must not access another app's runtime or storage. They must use the inje
 
 | App | Source | Implemented behavior |
 |---|---|---|
-| CAIRN | `applications/cairn/app.js` + `preview/cairn.js` | Command registry, shell, virtual filesystem, command history, manuals and capability checks |
+| CAIRN | `applications/cairn/app.js` + `preview/cairn.js` | Command registry, shell, virtual filesystem, runtime-backed private session persistence, bounded command history, exit-status expansion, manuals and capability checks |
 | LOCUS | `applications/locus/app.js` | Browse app-private files, navigate folders, create files/folders, edit/save and delete |
 | QUANTA | `applications/quanta/app.js` | Arithmetic parser, keyboard/keypad input, history, recall and copy |
 | CADENCE | `applications/cadence/app.js` | Persistent tasks, priorities, due dates, filters, completion, deletion and notifications |
