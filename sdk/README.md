@@ -1,5 +1,12 @@
 # SAND application SDK
 
-This directory currently contains only the stable binary-format declarations for the SAPP v1 package. It intentionally does not provide console, filesystem, process, GUI, or device calls: those APIs do not exist as a public kernel ABI yet.
+The SDK contains two deliberately separate layers:
 
-Include headers from sdk/include when building host-side format tooling or an application that needs to inspect SAPP structures. Target applications should wait for a versioned syscall ABI before depending on kernel services.
+- \`include/sand/sapp.h\` — SAPP v1 binary-format declarations.
+- \`runtime/sand-runtime.js\` — host-side application runtime reference implementation.
+
+The runtime ABI is \`sand.app-runtime/0.1\`. It provides app lifecycle, local events, capability checks, namespaced JSON storage, typed settings, host-mediated IPC and an injected platform-service adapter.
+
+The runtime is not a kernel ABI. SAND OS does not yet expose stable public filesystem, process, GUI, networking, device or window syscalls. Native service requests fail explicitly unless an embedding host supplies a compatible adapter. Never infer syscall numbers or fall back to host shell commands.
+
+See [runtime documentation](runtime/README.md) and [the integration contract](../docs/app-runtime.md).

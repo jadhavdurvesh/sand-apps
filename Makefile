@@ -4,7 +4,7 @@ LD ?= ld
 BUILD := build
 APP := hello
 
-.PHONY: all tools hello apps test clean
+.PHONY: all tools hello apps test test-js clean
 all: tools apps hello
 
 tools:
@@ -28,6 +28,9 @@ hello: $(BUILD)/$(APP).elf
 
 test:
 	$(PYTHON) -m unittest discover -s tests -v
+
+test-js:
+	node --test tests/test_cairn.cjs tests/test_runtime.cjs
 
 clean:
 	rm -rf $(BUILD) dist
