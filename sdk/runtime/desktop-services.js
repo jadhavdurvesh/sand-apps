@@ -23,7 +23,7 @@ function createDesktopHost(options={}){
  function identity(appId,cap){const grants=grantTable.get(appId);if(!grants)fail("APP_NOT_REGISTERED","Application is not registered with desktop services");if(!grants.has(cap))fail("PERMISSION_DENIED","Desktop service capability not granted: "+cap)}
  function appFiles(appId){if(!files.has(appId)){let saved=null;try{saved=storage.get(appId,"desktop.files.v1")}catch(_){}const entries=Array.isArray(saved)?saved:[["/",{type:"directory",modified:0}]];const fs=new Map(entries);if(!fs.has("/"))fs.set("/",{type:"directory",modified:0});files.set(appId,fs)}return files.get(appId)}
  function saveAppFiles(appId,fs){storage.set(appId,"desktop.files.v1",Array.from(fs.entries()))}
- function fileInfo(path,item){return {path,name:path.split("/").pop()||"/",type:item.type,size:item.type==="file"?item.content.length:0,modified:item.modified}}
+ function fileInfo(path,item){return {path,name:path.split("/").pop()||"/",type:item.type,size:item.type==="file"?new TextEncoder().encode(item.content).length:0,modified:item.modified}}
  function dispatch(req){
   if(!obj(req)||req.abi!==Sand.ABI||typeof req.appId!=="string"||typeof req.service!=="string"||typeof req.operation!=="string")fail("INVALID_REQUEST","Malformed desktop service request");
   const key=req.service+"."+req.operation,cap=CAP[key];if(!cap||req.capability!==cap)fail("INVALID_REQUEST","Unknown service operation or incorrect capability");identity(req.appId,cap);
@@ -60,7 +60,7 @@ function createDesktopHost(options={}){
    if(key==="files.read"){const f=fs.get(path);if(!f)fail("FILE_NOT_FOUND","File not found");if(f.type!=="file")fail("IS_DIRECTORY","Cannot read a directory");return f.content}
    if(key==="files.stat"){const f=fs.get(path);if(!f)fail("FILE_NOT_FOUND","Path not found");return fileInfo(path,f)}
    if(key==="files.list"){const dir=fs.get(path);if(!dir||dir.type!=="directory")fail("DIRECTORY_NOT_FOUND","Directory not found");const prefix=path==="/"?"/":path+"/",out=[];for(const [child,item] of fs){if(child!==path&&child.startsWith(prefix)&&!child.slice(prefix.length).includes("/"))out.push(fileInfo(child,item))}return out.sort((a,b)=>a.name.localeCompare(b.name))}
-   if(key==="files.delete"){const f=fs.get(path);if(!f)fail("FILE_NOT_FOUND","Path not found");if(f.type==="directory"&&Array.from(fs.keys()).some(k=>k!==path&&k.startsWith(path+"/")))fail("DIRECTORY_NOT_EMPTY","Directory is not empty");fs.delete(path);saveAppFiles(req.appId,fs);hub.emit("desktop.files.changed",{appId:req.appId,path,operation:"delete"});return {ok:true}}
+   if(key==="files.delete"){if(path==="/")fail("INVALID_PATH","Cannot delete the filesystem root");const f=fs.get(path);if(!f)fail("FILE_NOT_FOUND","Path not found");if(f.type==="directory"&&Array.from(fs.keys()).some(k=>k!==path&&k.startsWith(path+"/")))fail("DIRECTORY_NOT_EMPTY","Directory is not empty");fs.delete(path);saveAppFiles(req.appId,fs);hub.emit("desktop.files.changed",{appId:req.appId,path,operation:"delete"});return {ok:true}}
   }
   fail("UNSUPPORTED_OPERATION","Unsupported desktop service operation: "+key)
  }
