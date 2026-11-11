@@ -24,7 +24,7 @@ jobs:
       - name: Check preview JavaScript syntax
         run: |
           node --check preview/app.js
-          node --check preview/cairn.js
+          node --check applications/cairn/shell.js
       - name: Build SAND Hello package
         run: make clean all
       - name: Upload SAPP artifact
