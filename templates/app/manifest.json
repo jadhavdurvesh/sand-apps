@@ -1,0 +1,12 @@
+{
+  "id": "example-app",
+  "name": "Example App",
+  "version": "0.1.0",
+  "description": "A starter application for the SAND developer SDK.",
+  "capabilities": [
+    "storage.read",
+    "storage.write",
+    "platform.window.create"
+  ],
+  "entrypoint": "app.js"
+}
