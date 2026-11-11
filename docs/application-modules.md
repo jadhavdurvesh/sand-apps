@@ -1,6 +1,6 @@
 # First-party application modules
 
-The five core SAND apps are maintained as independent source modules under `applications/<app-id>/app.js`.
+The eight core SAND apps are maintained as independent source modules under `applications/<app-id>/app.js`.
 
 ## Host integration
 
@@ -25,6 +25,9 @@ Modules must not access another app's runtime or storage. They must use the inje
 | QUANTA | `applications/quanta/app.js` | Arithmetic parser, keyboard/keypad input, history, recall and copy |
 | CADENCE | `applications/cadence/app.js` | Persistent tasks, priorities, due dates, filters, completion, deletion and notifications |
 | KEYSTONE | `applications/keystone/app.js` | Theme, accent and reduced-motion preferences using typed runtime settings |
+| GLYPH | `applications/glyph/app.js` | Browse its app-private file workspace, create, edit, search and save UTF-8 text files |
+| MORROW | `applications/morrow/app.js` | Persistent private notes, search, quick capture and editing |
+| CHRONOS | `applications/chronos/app.js` | Local clock, stopwatch, countdown timer and persistent alarms with notifications |
 
 ## Verification
 
@@ -36,4 +39,4 @@ make test-js
 python3 tools/validate_apps.py
 ```
 
-`tests/test_app_modules.cjs` checks that each module parses, registers independently, exports a mount function and is loaded by the desktop host.
+`sdk/ui/app-kit.js` provides shared, framework-free UI and app-private storage helpers. QUANTA calculation history and MORROW notes use the app runtime storage; GLYPH uses the capability-gated virtual file service. `tests/test_app_modules.cjs` checks that each module parses, registers independently, exports a mount function and is loaded by the desktop host.
