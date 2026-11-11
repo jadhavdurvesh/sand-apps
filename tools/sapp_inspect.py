@@ -113,7 +113,7 @@ def main():
         print(f"sapp-inspect: INVALID: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, indent=2))
-    print("SAPP v1: VALID")
+    print(f"SAPP v{result['version']}: STRUCTURALLY VALID (signature trust not checked)")
     return 0
 
 if __name__ == "__main__":
