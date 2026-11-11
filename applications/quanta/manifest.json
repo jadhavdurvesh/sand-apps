@@ -12,6 +12,8 @@
   "capabilities": [
     "storage.read",
     "storage.write",
-    "platform.window.create"
+    "platform.window.create",
+    "platform.notifications.create",
+    "platform.desktop.events"
   ]
 }
