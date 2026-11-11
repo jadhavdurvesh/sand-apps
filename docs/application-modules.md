@@ -27,7 +27,7 @@ Modules must not access another app's runtime or storage. They must use the inje
 | KEYSTONE | `applications/keystone/app.js` | Theme, accent and reduced-motion preferences using typed runtime settings |
 | GLYPH | `applications/glyph/app.js` | Browse its app-private file workspace, create, edit, search and save UTF-8 text files |
 | MORROW | `applications/morrow/app.js` | Persistent private notes, search, quick capture and editing |
-| CHRONOS | `applications/chronos/app.js` | Local clock, stopwatch, countdown timer and persistent alarms with notifications |
+| CHRONOS | `applications/chronos/app.js` | Local clock, stopwatch, countdown timer and persistent alarm definitions; notifications run while the preview app is open |
 
 ## Verification
 
