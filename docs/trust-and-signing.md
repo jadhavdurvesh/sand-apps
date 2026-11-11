@@ -60,13 +60,13 @@ python3 tools/sandcert.py verify dist/example.signed.sandpkg \\
 - A root is trusted only after an explicit administrative action or trusted OS provisioning. A package cannot add its own root.
 - A successful signature is not a malware verdict. Continue to enforce least-privilege capabilities, process isolation, resource limits and update policy.
 
-## Required production work before native enforcement
+## SAPP v2 developer tooling\n\nThe repository now includes `tools/sapp_sign.py`, `tools/sapp_inspect.py` and `tools/sapp_verify.py`. They convert a structurally valid unsigned SAPP v1 image into SAPP v2, embed the publisher certificate, sign the finalized header and executable bytes using Ed25519, and verify the certificate chain and signature against an explicit trust store. See [SAPP v2 format](../FORMAT.md). SAPP v1 remains unchanged and unsigned. Host verification is not native enforcement.\n\n## Required production work before native enforcement
 
 This implementation is a developer-side prototype and must not be treated as a production PKI or kernel security boundary. The following remain mandatory:
 
 1. Native SAND loader verification before mapping or executing an app; fail closed for unsigned or invalid signatures.
-2. A stable, versioned signed SAPP envelope. SAPP v1 currently reserves signature fields and rejects non-zero signature offsets, so do not put signatures into SAPP v1.
-3. A canonical binary package representation and a formally specified signature transcript, not ad hoc JSON serialization across different implementations.
+2. Native SAND loader support for the signed SAPP v2 envelope specified in [FORMAT.md](../FORMAT.md). The developer tools now create and verify SAPP v2; the OS loader does not yet enforce it.
+3. A cross-language canonicalization specification and test vectors so the native loader verifies exactly the same signed transcript as the host tools.
 4. Certificate revocation, key rotation, root rollover, recovery and offline update policy.
 5. A trust-store format authenticated by OS provisioning, protected against unprivileged modification and rollback.
 6. Explicit user/admin publisher enrollment, certificate expiry policy and publisher identity verification.
