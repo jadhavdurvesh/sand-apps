@@ -2,19 +2,15 @@
   "id": "pulse",
   "name": "PULSE",
   "version": "0.1.0",
-  "description": "System monitor for resource usage, storage and process activity.",
+  "description": "Browser-visible platform and storage monitor.",
   "phase": "extended",
-  "status": "planned",
-  "prototype": false,
-  "entrypoint": null,
-  "target": "native-sand",
+  "status": "host-prototype",
+  "prototype": true,
+  "entrypoint": "../../preview/index.html",
+  "target": "host-preview",
   "sapp": "pending-abi",
   "capabilities": [
-    "storage.read",
-    "settings.read",
     "platform.info.read",
-    "platform.process.read",
-    "platform.device.read",
     "platform.window.create"
   ]
 }
