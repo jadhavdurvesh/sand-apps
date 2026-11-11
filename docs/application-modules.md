@@ -1,6 +1,6 @@
 # First-party application modules
 
-All thirteen SAND apps are maintained as independent source modules under `applications/<app-id>/app.js`.
+All fourteen SAND apps are maintained as independent source modules under `applications/<app-id>/app.js`.
 
 ## Host integration
 
@@ -33,6 +33,7 @@ Modules must not access another app's runtime or storage. They must use the inje
 | CRATE | `applications/crate/app.js` | Build, inspect and extract SANDPACK v1 JSON bundles with size and entry limits |
 | SPECTRA | `applications/spectra/app.js` | Local audio/video playback, queue, seeking, volume and track changes |
 | BEACON | `applications/beacon/app.js` | Online/offline state and optional browser Network Information API fields |
+| FORGE | `applications/forge/app.js` | Installed-app catalogue, local package import, per-app permission editor and uninstall for local packages |
 
 ## Verification
 
