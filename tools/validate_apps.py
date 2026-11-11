@@ -21,11 +21,11 @@ def validate():
   if isinstance(caps,list) and all(isinstance(c,str) for c in caps) and len(caps)!=len(set(caps)):errors.append(f"{app}: duplicate runtime capabilities")
   phase="core" if app in CORE else "extended"
   if d["phase"]!=phase:errors.append(f"{app}: expected phase {phase}")
-  expected_status="host-prototype" if phase=="core" else "planned"
+  expected_status="host-prototype"
   if d["status"]!=expected_status:errors.append(f"{app}: expected status {expected_status}")
-  if d["prototype"]!=(phase=="core"):errors.append(f"{app}: prototype flag mismatch")
+  if d["prototype"] is not True:errors.append(f"{app}: host prototype flag mismatch")
  return errors
 if __name__=="__main__":
  errors=validate()
  if errors:print("\n".join(errors),file=sys.stderr);raise SystemExit(1)
- print(f"Validated {len(CORE)} core apps and {len(EXTENDED)} planned extended apps.")
+ print(f"Validated {len(CORE)} core apps and {len(EXTENDED)} extended host prototypes.")
