@@ -34,11 +34,13 @@ function check(grants,cap){if(!Object.prototype.hasOwnProperty.call(CAPABILITIES
 function matches(value,schema){if(schema.type==="array")return Array.isArray(value);if(schema.type==="object")return object(value);if(schema.type==="integer")return Number.isInteger(value);if(schema.type==="number")return typeof value==="number"&&Number.isFinite(value);return typeof value===schema.type}
 function validateSettings(schemas){
  if(!object(schemas))fail("INVALID_SETTINGS","Settings schema must be an object");
+ const normalized={};
  for(const [name,s] of Object.entries(schemas)){
   if(!/^[a-z][a-zA-Z0-9._-]{0,63}$/.test(name)||!object(s)||!["string","boolean","number","integer","object","array"].includes(s.type)||!Object.prototype.hasOwnProperty.call(s,"default")||!matches(s.default,s))fail("INVALID_SETTINGS","Invalid setting schema: "+name);
   if(s.enum!==undefined&&(!Array.isArray(s.enum)||!s.enum.length||!s.enum.every(v=>matches(v,s))||!s.enum.some(v=>JSON.stringify(v)===JSON.stringify(s.default))))fail("INVALID_SETTINGS","Invalid setting enum: "+name);
+  const safe=clone(s);if(safe.enum)safe.enum=Object.freeze(safe.enum);normalized[name]=Object.freeze(safe);
  }
- return schemas;
+ return Object.freeze(normalized);
 }
 function createRuntime(options={}){
  if(!object(options))fail("INVALID_OPTIONS","Runtime options must be an object");
@@ -70,10 +72,10 @@ function createRuntime(options={}){
   init(context){if(state!==STATES.CREATED)fail("INVALID_STATE","Only created apps can initialize");transition(STATES.INITIALIZING,context||null);try{if(typeof options.onInitialize==="function"){const result=options.onInitialize(runtime,context||null);if(result&&typeof result.then==="function")fail("ASYNC_INITIALIZER","Runtime 0.1 requires a synchronous initializer")}transition(STATES.READY,null);events.emit("app.ready",{appId:manifest.id});return runtime}catch(e){lastError=e;transition(STATES.FAILED,{message:e.message});throw e}},
   suspend(reason){if(state!==STATES.READY)fail("INVALID_STATE","Only ready apps can suspend");transition(STATES.SUSPENDED,{reason:reason||"requested"});return runtime},
   resume(){if(state!==STATES.SUSPENDED)fail("INVALID_STATE","Only suspended apps can resume");transition(STATES.READY,null);events.emit("app.resumed",{appId:manifest.id});return runtime},
-  stop(reason){if(state===STATES.STOPPED)return runtime;if(![STATES.READY,STATES.SUSPENDED,STATES.FAILED].includes(state))fail("INVALID_STATE","Cannot stop from state "+state);transition(STATES.STOPPING,{reason:reason||"requested"});events.emit("app.stopping",{appId:manifest.id});if(typeof options.onStop==="function")options.onStop(runtime,reason||"requested");transition(STATES.STOPPED,null);events.clear();messages.clear();return runtime},
+  stop(reason){if(state===STATES.STOPPED)return runtime;if(![STATES.READY,STATES.SUSPENDED,STATES.FAILED].includes(state))fail("INVALID_STATE","Cannot stop from state "+state);transition(STATES.STOPPING,{reason:reason||"requested"});events.emit("app.stopping",{appId:manifest.id});if(typeof options.onStop==="function")options.onStop(runtime,reason||"requested");transition(STATES.STOPPED,null);events.clear();lifecycle.clear();messages.clear();return runtime},
   storage:appStorage,settings,
   requestService(service,operation,payload={},capability){active();if(typeof service!=="string"||!/^[a-z][a-z0-9._-]{0,47}$/.test(service)||typeof operation!=="string"||!/^[a-z][a-z0-9._-]{0,63}$/.test(operation))return Promise.reject(new RuntimeError("INVALID_REQUEST","Invalid service or operation"));const required=requiredServiceCapability(service,operation);if(!required||capability!==required)return Promise.reject(new RuntimeError("INVALID_REQUEST","Service operation requires its designated capability"));try{check(grants,required)}catch(e){return Promise.reject(e)}if(!platform)return Promise.reject(new RuntimeError("SERVICE_UNAVAILABLE","Native platform adapter is not connected"));let safe;try{safe=clone(payload)}catch(e){return Promise.reject(e)}return Promise.resolve().then(()=>platform.request({abi:ABI,appId:manifest.id,service,operation,capability:required,payload:safe})).then(clone)},
-  onMessage(topic,fn){check(grants,"ipc.receive");if(typeof topic!=="string"||!TOPIC.test(topic))fail("INVALID_TOPIC","Invalid message topic");return messages.on(topic,fn)},
+  onMessage(topic,fn){usable();check(grants,"ipc.receive");if(typeof topic!=="string"||!TOPIC.test(topic))fail("INVALID_TOPIC","Invalid message topic");return messages.on(topic,fn)},
   send(target,topic,payload){active();check(grants,"ipc.send");if(!transport)return Promise.reject(new RuntimeError("IPC_UNAVAILABLE","Inter-app transport is not connected"));if(!ID.test(target||"")||typeof topic!=="string"||!TOPIC.test(topic))return Promise.reject(new RuntimeError("INVALID_MESSAGE","Invalid target or topic"));let safe;try{safe=clone(payload)}catch(e){return Promise.reject(e)}return transport.send({from:manifest.id,to:target,topic,payload:safe})},
   
  };
@@ -81,6 +83,7 @@ function createRuntime(options={}){
  return Object.freeze(runtime);
 }
 function createHost(options={}){
+ if(!object(options))fail("INVALID_OPTIONS","Host options must be an object");
  const storage=options.storage||createMemoryStorageAdapter(),platform=options.platform||null,apps=new Map();
  return Object.freeze({
   launch(manifest,launchOptions={}){const clean=validateManifest(manifest);if(apps.has(clean.id))fail("APP_ALREADY_RUNNING","App already running: "+clean.id);const app=createRuntime({manifest,grants:launchOptions.grants===undefined?[]:launchOptions.grants,storage:launchOptions.storage||storage,platform:launchOptions.platform||platform,settings:launchOptions.settings||{},onInitialize:launchOptions.onInitialize,onStop:launchOptions.onStop,transport:{send:message=>{const target=apps.get(message.to);if(!target)return Promise.reject(new RuntimeError("APP_NOT_FOUND","Target app is not running: "+message.to));try{return Promise.resolve(internalDelivery.get(target)(message))}catch(e){return Promise.reject(e)}}}});apps.set(clean.id,app);try{app.init(launchOptions.context||null)}catch(e){apps.delete(clean.id);throw e}return app},
