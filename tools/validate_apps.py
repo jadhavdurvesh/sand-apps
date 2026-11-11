@@ -2,7 +2,7 @@
 """Validate first-party application manifests and phase boundaries."""
 import json,pathlib,sys
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-CORE={"cairn","locus","quanta","cadence","keystone"}
+CORE={"cairn","locus","quanta","cadence","keystone","glyph","morrow","chronos"}
 EXTENDED={"pulse","glyph","prism","morrow","crate","chronos","spectra","beacon"}
 CAPABILITIES={"storage.read","storage.write","storage.delete","settings.read","settings.write","ipc.send","ipc.receive","platform.info.read","platform.window.create","platform.files.read","platform.files.write","platform.process.read","platform.device.read","platform.network.read","platform.notifications.create","platform.desktop.events"}
 def validate():
