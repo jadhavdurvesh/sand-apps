@@ -6,3 +6,9 @@ dist/
 __pycache__/
 .pytest_cache/
 .venv/
+
+# Local signing material and device trust state (never commit private keys)
+private/
+*.pem
+device-trust.json
+trust-store*.json
