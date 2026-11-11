@@ -16,9 +16,9 @@ Explore the interactive host preview by opening `preview/index.html` in a browse
 
 **PULSE** (system monitor), **GLYPH** (text/code editor), **PRISM** (image viewer), **MORROW** (notes), **CRATE** (archive manager), **CHRONOS** (clock and timers), **SPECTRA** (media player), **BEACON** (network manager).
 
-## Shared application runtime
+## Shared application runtime and desktop services
 
-The SDK provides a common host-side runtime for app lifecycle, events, capability permissions, per-app storage, typed settings, inter-app messaging and a versioned platform adapter. The five-app browser preview uses it for lifecycle management; CADENCE persistence and KEYSTONE preferences use the runtime storage/settings APIs. See [runtime documentation](docs/app-runtime.md). This is not a kernel ABI and native OS services remain pending.
+The SDK provides a common host-side runtime plus desktop service contracts for app lifecycle, capability permissions, per-app storage, typed settings, IPC, logical windows, notifications, desktop events and private virtual files. The five-app browser preview launches through the desktop host. See [runtime documentation](docs/app-runtime.md) and [desktop services](docs/desktop-services.md). These are host-preview implementations, not native kernel or desktop services.
 
 ## Build and test
 

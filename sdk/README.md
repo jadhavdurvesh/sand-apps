@@ -1,4 +1,4 @@
-# SAND Application Runtime
+# SAND Application SDK and Desktop Services
 
 Version **0.1.0** · ABI **sand.app-runtime/0.1**
 
