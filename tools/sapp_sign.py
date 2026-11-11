@@ -2,7 +2,6 @@
 """Convert an unsigned SAPP v1 image into a signed SAPP v2 image."""
 import argparse
 import base64
-import hashlib
 import json
 import os
 import struct
@@ -37,10 +36,6 @@ def openssl(*args):
 
 def public_from_private(path):
     return openssl("pkey", "-in", str(path), "-pubout")
-
-
-def key_id(pem):
-    return hashlib.sha256(openssl("pkey", "-pubin", "-outform", "DER", input= None) if False else pem).hexdigest()
 
 
 def sign(private_key, data):
