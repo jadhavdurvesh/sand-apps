@@ -11,7 +11,6 @@
 | **KEYSTONE** | System settings |
 | **GLYPH** | Text and code editor for its private file workspace |
 | **MORROW** | Private notes and personal workspace |
-| **CHRONOS** | Clock, alarms, timers and stopwatch |
 
 All eight have independent application modules and interactive host-side prototypes in `preview/`.
 
@@ -20,9 +19,7 @@ All eight have independent application modules and interactive host-side prototy
 | App | Responsibility |
 |---|---|
 | **PULSE** | CPU, memory, storage and process monitor |
-| **GLYPH** | Text and code editor |
 | **PRISM** | Image viewer and metadata |
-| **MORROW** | Notes and personal workspace |
 | **CRATE** | Archive manager |
 | **CHRONOS** | Clock, alarms, timers and stopwatch |
 | **SPECTRA** | Local media player and library |
