@@ -32,6 +32,7 @@ All fourteen have independent application modules and interactive host-side prot
 2. Every app has a stable ID and manifest.
 3. Host prototypes are development previews, not native SAND OS applications.
 4. Native integration requires documented, versioned OS services and a stable application ABI.
-5. SAPP v1 packaging must not imply that missing kernel APIs exist.\n6. FORGE local package installation validates and stores packages; it does not execute third-party code. See [package system](package-system.md).
+5. SAPP v1 packaging must not imply that missing kernel APIs exist.
+6. FORGE local package installation validates and stores packages; it does not execute third-party code. See [package system](package-system.md).
 
 Names are working project names; trademark availability has not been verified.
