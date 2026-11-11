@@ -2,7 +2,7 @@
 "use strict";
 if(!Sand)throw new Error("SAND application runtime must load before desktop services");
 const CAP={
- "system.info":"platform.info.read","window.create":"platform.window.create","window.destroy":"platform.window.create","window.focus":"platform.window.create","window.minimize":"platform.window.create","window.maximize":"platform.window.create","window.list":"platform.window.create",
+ "system.info":"platform.info.read","window.create":"platform.window.create","window.destroy":"platform.window.create","window.focus":"platform.window.create","window.minimize":"platform.window.create","window.maximize":"platform.window.create","window.restore":"platform.window.create","window.list":"platform.window.create",
  "notifications.create":"platform.notifications.create","notifications.dismiss":"platform.notifications.create","notifications.list":"platform.notifications.create",
  "files.read":"platform.files.read","files.list":"platform.files.read","files.stat":"platform.files.read","files.write":"platform.files.write","files.mkdir":"platform.files.write","files.delete":"platform.files.write"
 };
@@ -43,6 +43,7 @@ function createDesktopHost(options={}){
    if(key==="window.focus"){win.state="focused";hub.emit("desktop.window.focused",win);return clone(win)}
    if(key==="window.minimize"){win.state="minimized";hub.emit("desktop.window.minimized",win);return clone(win)}
    if(key==="window.maximize"){win.state="maximized";hub.emit("desktop.window.maximized",win);return clone(win)}
+   if(key==="window.restore"){win.state="normal";hub.emit("desktop.window.restored",win);return clone(win)}
   }
   if(key==="notifications.create"){
    const title=typeof p.title==="string"&&p.title.trim()?p.title.trim().slice(0,100):"Notification";
