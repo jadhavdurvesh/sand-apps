@@ -10,7 +10,13 @@
 - **CADENCE** — task manager
 - **KEYSTONE** — system settings
 
-Explore the interactive host preview by opening `preview/index.html` in a browser. See [the full app catalogue](docs/application-catalog.md).
+Run the interactive desktop preview locally:
+
+```sh
+python3 -m http.server 8000
+```
+
+Then open `http://localhost:8000/preview/`. See [preview usage and shortcuts](docs/preview-usage.md) and [the full app catalogue](docs/application-catalog.md).
 
 ## Phase 2 — Extended suite (catalogued)
 
