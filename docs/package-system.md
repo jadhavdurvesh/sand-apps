@@ -44,7 +44,7 @@ python3 tools/sandpkg.py validate dist/example-app-0.1.0.sandpkg
 
 The JavaScript SDK lives at `sdk/package/package-manager.js` and exports `SandPackages.createManager({storage, catalog})`, package validation, package creation, semantic version comparison, install/update, uninstall, and permission persistence APIs.
 
-## Current execution boundary
+## Publisher signing and trust\n\nThe initial Ed25519 publisher certificate and SANDPKG signing workflow is documented in [Trust & Code Integrity](trust-and-signing.md). Use `tools/sandcert.py` to create an offline root, issue publisher certificates, explicitly trust roots, sign packages and verify signatures. This is currently developer-side verification only; it is not enforced by the SAND OS loader.\n\n## Current execution boundary
 
 FORGE validates and stores third-party packages. It does **not** execute their JavaScript, load arbitrary modules, or grant installed packages access to system services. A local package is shown as `launchable: false`. This is intentional: the current browser preview is not an untrusted-code sandbox, and the kernel does not yet expose a stable app ABI, trusted signature verification, process isolation, or native capability enforcement.
 
