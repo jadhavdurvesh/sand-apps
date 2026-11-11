@@ -2,16 +2,14 @@
   "id": "prism",
   "name": "PRISM",
   "version": "0.1.0",
-  "description": "Image viewer with zoom, rotation and metadata.",
+  "description": "Local image viewer with zoom, rotation and image metadata.",
   "phase": "extended",
-  "status": "planned",
-  "prototype": false,
-  "entrypoint": null,
-  "target": "native-sand",
+  "status": "host-prototype",
+  "prototype": true,
+  "entrypoint": "../../preview/index.html",
+  "target": "host-preview",
   "sapp": "pending-abi",
   "capabilities": [
-    "storage.read",
-    "platform.files.read",
     "platform.window.create"
   ]
 }
