@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate and display a SAPP v1 package."""
+"""Structurally validate and display SAPP v1/v2 executable containers."""
 from __future__ import annotations
 import argparse
 import json
@@ -22,14 +22,31 @@ def inspect(data: bytes):
     (magic, version, arch, hsize, flags, entry, seg_off, seg_count,
      meta_off, meta_size, file_size, sig_off, sig_size, reloc_off,
      reloc_count, reserved) = HEADER.unpack_from(data)
-    if magic != b"SAPP" or version != 1 or arch != 1 or hsize != 64:
+    if magic != b"SAPP" or version not in (1, 2) or arch != 1 or hsize != 64:
         raise FormatError("unsupported SAPP magic, version, architecture, or header size")
-    if flags or reserved != bytes(8) or sig_off or sig_size or file_size != len(data):
-        raise FormatError("invalid flags, reserved bytes, signature fields, or file size")
+    if flags or reserved != bytes(8) or file_size != len(data):
+        raise FormatError("invalid flags, reserved bytes, or file size")
+    if version == 1 and (sig_off or sig_size):
+        raise FormatError("SAPP v1 does not support signatures")
+    if version == 2 and (not sig_size or sig_off < HEADER.size or sig_off + sig_size != len(data)):
+        raise FormatError("SAPP v2 requires a signature block at the end of the file")
+    content_limit = sig_off if version == 2 else len(data)
+    signature = None
+    if version == 2:
+        try:
+            signature = json.loads(data[sig_off:])
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise FormatError("signature block is not valid UTF-8 JSON") from exc
+        if not isinstance(signature, dict) or signature.get("format") != "SAND-SAPP-SIGNATURE" or signature.get("version") != 1 or signature.get("algorithm") != "Ed25519":
+            raise FormatError("unsupported SAPP v2 signature block")
+        if not isinstance(signature.get("publisherCertificate"), dict) or not isinstance(signature.get("signature"), str):
+            raise FormatError("SAPP v2 signature block is missing its publisher certificate or signature")
+        if sig_off < meta_off + meta_size:
+            raise FormatError("signature block overlaps metadata")
     if not 1 <= seg_count <= 8 or reloc_count > 256:
         raise FormatError("segment or relocation count exceeds loader limits")
     def range_ok(off, size):
-        return off <= len(data) and size <= len(data) - off
+        return off <= content_limit and size <= content_limit - off
     seg_bytes = seg_count * SEGMENT.size
     if not range_ok(seg_off, seg_bytes) or seg_off < HEADER.size:
         raise FormatError("segment table is out of range")
@@ -85,6 +102,7 @@ def inspect(data: bytes):
             raise FormatError(f"relocation {i} target is not in writable memory")
     return {"version": version, "architecture": "x86-32", "entry": f"0x{entry:08x}",
             "metadata": metadata, "segments": segments, "relocations": reloc_count,
+            "signature": ({ "algorithm": signature.get("algorithm"), "publisher": signature.get("publisherCertificate", {}).get("subject") } if signature else None),
             "file_size": len(data)}
 
 def main():
@@ -97,7 +115,7 @@ def main():
         print(f"sapp-inspect: INVALID: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, indent=2))
-    print("SAPP v1: VALID")
+    print(f"SAPP v{result['version']}: STRUCTURALLY VALID (signature trust not checked)")
     return 0
 
 if __name__ == "__main__":

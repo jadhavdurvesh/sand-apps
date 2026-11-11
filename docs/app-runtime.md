@@ -35,6 +35,10 @@
 
 A manifest declaration is only a request. The host separately grants approved capabilities. Unknown and unrequested grants are rejected.
 
+## Permission decisions in the host preview
+
+FORGE stores user-approved capability grants in the host preview. The preview asks on first launch for requested capabilities other than the host-managed window baseline. Grants are applied at the next launch; changing permissions does not revoke an already running JavaScript object. This is user-experience scaffolding only, not an isolation boundary. A native host must authenticate app identity and enforce every operation outside the app process.
+
 ## Native integration
 
 This adapter is not a syscall ABI. The SAND OS integration layer must provide a versioned adapter that authenticates callers, independently enforces capabilities, validates requests and returns documented errors. Do not infer syscalls or use host shell commands as fallback.
