@@ -30,7 +30,7 @@ test:
 	$(PYTHON) -m unittest discover -s tests -v
 
 test-js:
-	node --test tests/test_cairn.cjs tests/test_runtime.cjs tests/test_desktop.cjs tests/test_app_modules.cjs tests/test_ui.cjs tests/test_package_manager.cjs
+	node --test tests/test_cairn.cjs tests/test_runtime.cjs tests/test_desktop.cjs tests/test_app_modules.cjs tests/test_ui.cjs tests/test_package_manager.cjs tests/test_sdk_types.cjs
 
 clean:
 	rm -rf $(BUILD) dist
