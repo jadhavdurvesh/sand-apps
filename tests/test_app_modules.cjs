@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const path=require("node:path");
 const vm=require("node:vm");
 const root=path.resolve(__dirname,"..");
-const apps=["cairn","locus","quanta","cadence","keystone","glyph","morrow","chronos","pulse","prism","crate","spectra","beacon"];
+const apps=["cairn","locus","quanta","cadence","keystone","glyph","morrow","chronos","pulse","prism","crate","spectra","beacon","forge"];
 
 test("first-party application modules parse and register independently",()=>{
  const context={console, setTimeout, clearTimeout};
