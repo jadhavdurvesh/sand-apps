@@ -25,7 +25,7 @@ test("first-party application modules parse and register independently",()=>{
 
 test("desktop host dispatches to application modules, not inline legacy renderers",()=>{
  const source=fs.readFileSync(path.join(root,"preview","app.js"),"utf8");
- assert.match(source,/window\.SandApps\[id\]\.mount/);
+ assert.match(source,/appModule\.mount/);
  assert.doesNotMatch(source,/render:terminal|render:files|render:calculator|render:tasks|render:settings/);
  const html=fs.readFileSync(path.join(root,"preview","index.html"),"utf8");
  for(const id of apps)assert.ok(html.includes("../applications/"+id+"/app.js"),id+" script included");
