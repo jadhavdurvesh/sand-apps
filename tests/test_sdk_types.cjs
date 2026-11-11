@@ -18,7 +18,7 @@ test("public SDK declaration file exists and documents the host ABI boundary", (
   assert.match(declarations, /interface SandAppMountContext/);
   assert.match(declarations, /sand\.app-runtime\/0\.1/);
   assert.match(declarations, /sand\.desktop-services\/0\.1/);
-  assert.match(docs, /\\*\\*not\\*\\* a native SAND OS ABI/);
+  assert.match(docs, /\*\*not\*\* a native SAND OS ABI/);
   assert.match(docs, /not a process sandbox/);
 });
 
