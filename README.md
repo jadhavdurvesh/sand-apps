@@ -27,11 +27,11 @@ Then open `http://localhost:8000/preview/`. See [preview usage and shortcuts](do
 
 ## First-party application source
 
-Each core application now has its own source module under `applications/<id>/`. The desktop host loads these modules through the shared app runtime; it no longer owns the individual app renderers. CAIRN's shell engine is packaged under `applications/cairn/`. See [application module architecture](docs/application-modules.md).
+Each application now has its own source module under `applications/<id>/`. The desktop host loads these modules through the shared app runtime; it no longer owns the individual app renderers. CAIRN's shell engine is packaged under `applications/cairn/`. See [application module architecture](docs/application-modules.md).
 
 ## Shared application runtime and desktop services
 
-The browser preview now opens a windowed desktop shell with a launcher, dock, draggable/resizable app windows, focus/minimize/maximize/close controls, notification center and clock. LOCUS uses the per-app virtual filesystem; files persist in browser storage. The SDK provides a common host-side runtime plus desktop service contracts for app lifecycle, capability permissions, per-app storage, typed settings, IPC, logical windows, notifications, desktop events and private virtual files. The eight-app browser preview launches through the desktop host. See [runtime documentation](docs/app-runtime.md) and [desktop services](docs/desktop-services.md). These are host-preview implementations, not native kernel or desktop services.
+The browser preview now opens a windowed desktop shell with a launcher, dock, draggable/resizable app windows, focus/minimize/maximize/close controls, notification center and clock. LOCUS uses the per-app virtual filesystem; files persist in browser storage. The SDK provides a common host-side runtime plus desktop service contracts for app lifecycle, capability permissions, per-app storage, typed settings, IPC, logical windows, notifications, desktop events and private virtual files. The thirteen-app browser preview launches through the desktop host. See [runtime documentation](docs/app-runtime.md) and [desktop services](docs/desktop-services.md). These are host-preview implementations, not native kernel or desktop services.
 
 ## Build and test
 
@@ -48,7 +48,7 @@ The native smoke-test produces `build/hello.elf` and `build/hello.sapp`.
 
 ## ABI boundary
 
-SAPP v1 is an early executable container, not a stable application ABI. The current kernel exposes only a test syscall and does not provide public terminal I/O, filesystem, windowing, process, networking or device APIs. The eight core apps are interactive host-side prototypes; they do not access real disks or the host shell. The remaining extended apps are catalogued only. Native integration follows only after relevant versioned OS services exist.
+SAPP v1 is an early executable container, not a stable application ABI. The current kernel exposes only a test syscall and does not provide public terminal I/O, filesystem, windowing, process, networking or device APIs. All thirteen apps are interactive host-side prototypes. Browser APIs expose only limited metrics, local user-selected files and browser connectivity; they do not provide native disk, process, network configuration or device access. Native integration follows only after relevant versioned OS services exist.
 
 Read [docs/abi-compatibility.md](docs/abi-compatibility.md) and [FORMAT.md](FORMAT.md) before changing package generation.
 
