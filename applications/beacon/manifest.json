@@ -2,17 +2,14 @@
   "id": "beacon",
   "name": "BEACON",
   "version": "0.1.0",
-  "description": "Network status, connections and configuration.",
+  "description": "Read-only browser network status and connection information.",
   "phase": "extended",
-  "status": "planned",
-  "prototype": false,
-  "entrypoint": null,
-  "target": "native-sand",
+  "status": "host-prototype",
+  "prototype": true,
+  "entrypoint": "../../preview/index.html",
+  "target": "host-preview",
   "sapp": "pending-abi",
   "capabilities": [
-    "storage.read",
-    "storage.write",
-    "platform.network.read",
     "platform.window.create"
   ]
 }
