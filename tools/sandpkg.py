@@ -31,7 +31,7 @@ def validate_manifest(manifest):
     if not isinstance(manifest.get("description"), str) or len(manifest["description"]) > 500:
         raise PackageError("description is required and must be at most 500 characters")
     caps = manifest.get("capabilities", [])
-    if not isinstance(caps, list) or len(caps) > 32 or len(caps) != len(set(caps)):
+    if not isinstance(caps, list) or len(caps) > 32 or any(not isinstance(cap, str) for cap in caps) or len(caps) != len(set(caps)):
         raise PackageError("capabilities must be a unique list")
     for cap in caps:
         if not isinstance(cap, str) or not re.fullmatch(r"(?:[a-z]+\.)+[a-z]+", cap):
