@@ -90,7 +90,9 @@ def create(source, output):
             raise PackageError(f"unsafe path: {rel}")
         files.append({"path": rel, "content": path.read_text(encoding="utf-8")})
     package = validate_package({"format": FORMAT, "formatVersion": VERSION, "manifest": manifest, "files": files})
-    Path(output).write_text(json.dumps(package, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    destination = Path(output)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(package, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
     return package
 
 
