@@ -80,7 +80,7 @@ The complete publisher certificate is embedded. Its issuer signature is independ
 The Ed25519 signature is calculated over:
 
 ```text
-SAND-SAPP-V2-ED25519\\0 || file[0:signature_offset]
+SAND-SAPP-V2-ED25519 followed by a NUL byte, then file[0:signature_offset]
 ```
 
 The signed prefix includes the final v2 header (including final file size and signature offset/size), segment table, metadata, relocation table and every executable payload byte. The signature block itself is excluded to avoid a circular signature. The signature block size is stable because an Ed25519 signature is always 64 bytes and its base64 representation is always 88 characters.
