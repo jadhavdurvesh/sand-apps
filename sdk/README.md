@@ -27,6 +27,7 @@ app.stop();
 - Settings: typed schemas, defaults, enums and change events.
 - IPC: host-mediated topic messaging; sender and receiver need separate grants.
 - Platform bridge: asynchronous versioned requests through an injected adapter.
+- Shared UI kit: framework-free DOM components, safe text escaping, byte formatting and app-private persistent stores (`sdk/ui/app-kit.js`).
 
 ## Security
 
