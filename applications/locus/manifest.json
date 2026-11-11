@@ -14,6 +14,8 @@
     "storage.write",
     "platform.files.read",
     "platform.files.write",
-    "platform.window.create"
+    "platform.window.create",
+    "platform.notifications.create",
+    "platform.desktop.events"
   ]
 }

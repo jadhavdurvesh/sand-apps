@@ -1,11 +1,11 @@
 "use strict";
 const $=(s,r=document)=>r.querySelector(s),workspace=$("#workspace");
 const appManifests={
-cairn:{id:"cairn",name:"CAIRN",version:"0.7.0",capabilities:["storage.read","storage.write"]},
-locus:{id:"locus",name:"LOCUS",version:"0.1.0",capabilities:["storage.read","storage.write","platform.files.read","platform.files.write","platform.window.create"]},
-quanta:{id:"quanta",name:"QUANTA",version:"0.1.0",capabilities:["storage.read","storage.write","platform.window.create"]},
-cadence:{id:"cadence",name:"CADENCE",version:"0.1.0",capabilities:["storage.read","storage.write","settings.read","settings.write","platform.window.create"]},
-keystone:{id:"keystone",name:"KEYSTONE",version:"0.1.0",capabilities:["settings.read","settings.write","platform.window.create"]}
+cairn:{id:"cairn",name:"CAIRN",version:"0.7.0",capabilities:["storage.read","storage.write","platform.window.create","platform.notifications.create","platform.desktop.events"]},
+locus:{id:"locus",name:"LOCUS",version:"0.1.0",capabilities:["storage.read","storage.write","platform.files.read","platform.files.write","platform.window.create","platform.notifications.create","platform.desktop.events"]},
+quanta:{id:"quanta",name:"QUANTA",version:"0.1.0",capabilities:["storage.read","storage.write","platform.window.create","platform.notifications.create","platform.desktop.events"]},
+cadence:{id:"cadence",name:"CADENCE",version:"0.1.0",capabilities:["storage.read","storage.write","settings.read","settings.write","platform.window.create","platform.notifications.create","platform.desktop.events"]},
+keystone:{id:"keystone",name:"KEYSTONE",version:"0.1.0",capabilities:["settings.read","settings.write","platform.window.create","platform.notifications.create","platform.desktop.events"]}
 };
 const desktopHost=window.SandDesktop.createDesktopHost({catalog:Object.values(appManifests),storage:window.SandRuntime.createLocalStorageAdapter(localStorage)});const appRuntimes=new Map();
 const settingSchemas={keystone:{theme:{type:"string",default:localStorage.getItem("sand-preview-theme")==="light"?"light":"dark",enum:["dark","light"]},accent:{type:"string",default:["#83b7ff","#a99bff","#74d6aa","#f0c477"].includes(localStorage.getItem("sand-preview-accent"))?localStorage.getItem("sand-preview-accent"):"#83b7ff",enum:["#83b7ff","#a99bff","#74d6aa","#f0c477"]},reducedMotion:{type:"boolean",default:localStorage.getItem("sand-preview-motion")==="true"}}};

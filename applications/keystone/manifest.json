@@ -12,6 +12,8 @@
   "capabilities": [
     "settings.read",
     "settings.write",
-    "platform.window.create"
+    "platform.window.create",
+    "platform.notifications.create",
+    "platform.desktop.events"
   ]
 }

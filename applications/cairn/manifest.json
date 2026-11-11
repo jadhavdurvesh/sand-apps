@@ -11,6 +11,9 @@
   "sapp": "pending-abi",
   "capabilities": [
     "storage.read",
-    "storage.write"
+    "storage.write",
+    "platform.window.create",
+    "platform.notifications.create",
+    "platform.desktop.events"
   ]
 }
