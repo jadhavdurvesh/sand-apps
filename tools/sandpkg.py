@@ -92,7 +92,7 @@ def create(source, output):
     package = validate_package({"format": FORMAT, "formatVersion": VERSION, "manifest": manifest, "files": files})
     destination = Path(output)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(package, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    destination.write_text(json.dumps(package, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return package
 
 
