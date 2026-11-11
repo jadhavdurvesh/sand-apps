@@ -34,3 +34,7 @@ The host preview persists each application's private virtual filesystem through 
 ## Windowed desktop preview
 
 The preview shell in `preview/index.html` provides a launcher (Alt+Space), five-app dock, movable/resizable windows, focus and window-state controls, a notification center, and a clock. Logical window lifecycle operations are mirrored into the desktop service API. This is a browser-hosted desktop experience; it is not yet a kernel compositor or native SAND desktop.
+
+## Desktop session restoration
+
+The host preview stores the open-app list, active app, window bounds, minimized state, and maximize restore bounds in browser local storage. On reload it restores the app windows. This is browser-local session state, not native SAND login/session management.
