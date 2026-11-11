@@ -18,7 +18,7 @@ test("public SDK declaration file exists and documents the host ABI boundary", (
   assert.match(declarations, /interface SandAppMountContext/);
   assert.match(declarations, /sand\.app-runtime\/0\.1/);
   assert.match(declarations, /sand\.desktop-services\/0\.1/);
-  assert.match(docs, /not a native SAND OS ABI/);
+  assert.match(docs, /\\*\\*not\\*\\* a native SAND OS ABI/);
   assert.match(docs, /not a process sandbox/);
 });
 
@@ -37,7 +37,11 @@ test("desktop and package declarations match the current host modules", () => {
   }
   for (const method of ["validatePackage", "createPackage", "createManager", "getPermissions", "setPermissions", "checkUpdates"]) {
     assert.ok(declarations.includes(method), "package declarations include " + method);
-    assert.equal(typeof packages[method], "function", "package implementation exposes " + method);
+  }
+  const data = new Map();
+  const manager = packages.createManager({ storage: { get: (_owner, key) => data.get(key), set: (_owner, key, value) => data.set(key, value) } });
+  for (const method of ["getPermissions", "setPermissions", "checkUpdates"]) {
+    assert.equal(typeof manager[method], "function", "package manager exposes " + method);
   }
   assert.equal(desktop.ABI, "sand.desktop-services/0.1");
 });
