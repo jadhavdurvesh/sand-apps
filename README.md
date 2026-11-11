@@ -16,6 +16,10 @@ Explore the interactive host preview by opening `preview/index.html` in a browse
 
 **PULSE** (system monitor), **GLYPH** (text/code editor), **PRISM** (image viewer), **MORROW** (notes), **CRATE** (archive manager), **CHRONOS** (clock and timers), **SPECTRA** (media player), **BEACON** (network manager).
 
+## Shared application runtime
+
+The SDK provides a common host-side runtime for app lifecycle, events, capability permissions, per-app storage, typed settings, inter-app messaging and a versioned platform adapter. The five-app browser preview uses it for lifecycle management; CADENCE persistence and KEYSTONE preferences use the runtime storage/settings APIs. See [runtime documentation](docs/app-runtime.md). This is not a kernel ABI and native OS services remain pending.
+
 ## Build and test
 
 Requirements for the SAPP smoke-test: Python 3.10+, GNU Make, GCC with 32-bit code-generation support, and GNU Binutils with i386 ELF support.
@@ -23,6 +27,7 @@ Requirements for the SAPP smoke-test: Python 3.10+, GNU Make, GCC with 32-bit co
 ```sh
 make clean all
 make test
+make test-js
 python3 tools/validate_apps.py
 ```
 

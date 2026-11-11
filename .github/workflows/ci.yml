@@ -17,8 +17,8 @@ jobs:
           node-version: "22"
       - name: Python unit tests
         run: make test
-      - name: CAIRN command-engine tests
-        run: node --test tests/test_cairn.cjs
+      - name: JavaScript runtime and CAIRN tests
+        run: make test-js
       - name: Validate app catalogue
         run: make apps
       - name: Check preview JavaScript syntax
