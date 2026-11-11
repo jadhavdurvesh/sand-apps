@@ -60,3 +60,8 @@ Read [docs/abi-compatibility.md](docs/abi-compatibility.md) and [FORMAT.md](FORM
 ## License
 
 Custom source-available, non-commercial license; not OSI-approved. See [LICENSE](LICENSE).
+
+
+## Signed native applications
+
+SAPP v2 adds Ed25519 publisher signatures and certificate-chain verification in the developer tooling. See [SAPP v2 format](FORMAT.md#sapp-v2-signed-executable-container) and [STCI trust policy](docs/trust-and-signing.md). Native SAND OS loader enforcement remains pending; unsigned v1 images are still the legacy format and must not be described as trusted.
