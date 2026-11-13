@@ -26,9 +26,32 @@ A segment uses <6I8s: virtual address, memory size, file offset, file size, perm
 
 A relocation uses <3I: target virtual address, type, addend. Only ABS32 is accepted.
 
+## SAND OS syscall ABI v3 (implemented in sand-os)
+
+Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, EDX; the result is returned in EAX (negative = error). The headers in `sdk/native/include/sand/` are copies of the kernel's `sdk/sapp/include/sand/abi.h` and friends; **sand-os remains the source of truth** and these copies must be refreshed when the ABI changes.
+
+| # | Name | Purpose |
+|---|---|---|
+| 1 | EXIT | end the process with a status |
+| 2 | WRITE | write bytes to the console |
+| 3 | GET_TICKS | 100 Hz tick counter |
+| 4 | GETPID | current process id |
+| 5 | YIELD | give up the CPU |
+| 6 | SLEEP_MS | sleep (scheduler-blocked) |
+| 7 | READ | blocking console read |
+| 8–11 | FS_READ / FS_WRITE / FS_LIST / FS_REMOVE | SANDFS v1 files |
+| 12–13 | SPAWN / WAIT | start an embedded app by name; wait for its exit status |
+| 14–17 | SYSINFO / PROC_LIST / APP_LIST / DEVICE_LIST | system introspection |
+| 18 | WIN_CREATE | `win_create(title, (w<<16)|h)` -> window id; surface 200-520 x 120-380, 3 windows system-wide |
+| 19 | WIN_DRAW | `win_draw(id, sand_draw*, count<=64)`: batched draw commands rendered by the kernel in the SAND typeface and shape renderer |
+| 20 | WIN_EVENT | `win_event(id, sand_event*)` -> 1 event / 0 none / <0 window gone (key, mouse down/up/move in surface coordinates) |
+| 21 | WIN_CLOSE | destroy the window |
+
+Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall. A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no resizable windows, app-owned pixel surfaces, networking or per-app permission enforcement (window creation is not yet permission-gated). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
+
 ## Known kernel limitations
 
-The current syscall dispatcher accepts only syscall 1 with magic argument 0x53414E44 as a kernel test. There is no stable public syscall ABI for console I/O, files, processes, windows, networking, or devices. The desktop is not yet a full window manager.
+Superseded detail: older kernels accepted only syscall 1. Current sand-os has the v2 development ABI above (console, files, processes, introspection). Still missing: a stable ABI, resizable windows and shared pixel buffers, networking, device access and permission enforcement. The desktop shell (SAND Dusk) now provides the window service above.
 
 This SDK currently builds and validates executable packages; it does not claim that ordinary applications can interact with the OS yet. ABI additions must be made in sand-os first, then documented and versioned here.
 
