@@ -51,6 +51,10 @@ python3 tools/validate_apps.py
 
 The native smoke-test produces `build/hello.elf` and `build/hello.sapp`.
 
+## Native apps on SAND OS
+
+**LOCUS** now has a native, windowed build (`applications/locus/native/`) that runs on SAND OS through the kernel window service (`run locus` in the shell): browse, preview, create and delete SANDFS files with mouse or keyboard. A console variant lives in `native-console/`. Both target the v3 development ABI in `sdk/native/`. The other apps remain host-side prototypes; porting them to the window service is the next step. See [docs/abi-compatibility.md](docs/abi-compatibility.md).
+
 ## ABI boundary
 
 SAPP v1 is an early executable container, not a stable application ABI. The current kernel exposes only a test syscall and does not provide public terminal I/O, filesystem, windowing, process, networking or device APIs. All fourteen apps are interactive host-side prototypes. Browser APIs expose only limited metrics, local user-selected files and browser connectivity; they do not provide native disk, process, network configuration or device access. Native integration follows only after relevant versioned OS services exist.

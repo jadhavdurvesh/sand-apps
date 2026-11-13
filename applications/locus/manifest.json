@@ -17,5 +17,12 @@
     "platform.window.create",
     "platform.notifications.create",
     "platform.desktop.events"
-  ]
+  ],
+  "native": {
+    "status": "windowed-v1",
+    "source": "native/main.c",
+    "console_source": "native-console/main.c",
+    "abi": 3,
+    "note": "Runs on SAND OS today through the kernel window service (run locus). A console variant is kept for serial sessions."
+  }
 }
