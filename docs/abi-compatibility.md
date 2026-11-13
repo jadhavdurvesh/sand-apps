@@ -47,6 +47,8 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 20 | WIN_EVENT | `win_event(id, sand_event*)` -> 1 event / 0 none / <0 window gone (key, mouse down/up/move in surface coordinates) |
 | 21 | WIN_CLOSE | destroy the window |
 
+Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
+
 Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall. A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no resizable windows, app-owned pixel surfaces, networking or per-app permission enforcement (window creation is not yet permission-gated). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
 
 ## Known kernel limitations
