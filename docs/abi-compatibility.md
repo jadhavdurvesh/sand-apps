@@ -26,7 +26,7 @@ A segment uses <6I8s: virtual address, memory size, file offset, file size, perm
 
 A relocation uses <3I: target virtual address, type, addend. Only ABS32 is accepted.
 
-## SAND OS syscall ABI v4 (implemented in sand-os)
+## SAND OS syscall ABI v5 (implemented in sand-os)
 
 Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, EDX; the result is returned in EAX (negative = error). The headers in `sdk/native/include/sand/` are copies of the kernel's `sdk/sapp/include/sand/abi.h` and friends; **sand-os remains the source of truth** and these copies must be refreshed when the ABI changes.
 
@@ -48,6 +48,8 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 21 | WIN_CLOSE | close the window (it fades out; further calls on it return NOENT) |
 | 22 | WIN_BLIT | `win_blit(id, sand_blit*)`: copy an app-owned 0x00RRGGBB pixel buffer into the surface, optional 1-4x integer upscale (a SAPP image is limited to 64 pages, so upscaling lets small buffers fill a window) |
 | 23 | WIN_RESIZABLE | `win_resizable(id, (min_w<<16)|min_h)`: opt in to user resizing; the app then receives `SAND_EV_RESIZE` (x,y = new client size, surface cleared) and must redraw |
+| 24 | SETTING_GET | `setting_get(key)`: read a system setting (`SAND_SET_ACCENT` 1 = palette 0-4, `SAND_SET_REDUCED_MOTION` 2, `SAND_SET_CLOCK_24H` 3) |
+| 25 | SETTING_SET | `setting_set(key, value)`: range-checked write; the desktop repaints and the kernel persists the table to `system.cfg` in SANDFS |
 
 Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
 

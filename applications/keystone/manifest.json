@@ -15,5 +15,19 @@
     "platform.window.create",
     "platform.notifications.create",
     "platform.desktop.events"
-  ]
+  ],
+  "native": {
+    "status": "windowed-v1",
+    "source": "native/main.c",
+    "abi": 5,
+    "note": "Native KEYSTONE window on the SAND OS window service: accent colour, reduced motion and 12/24-hour clock via the SETTING_GET/SETTING_SET syscalls, persisted by the kernel. Theme (dark/light) remains a host prototype setting.",
+    "launcher": {
+      "label": "KEYSTONE",
+      "subtitle": "Settings",
+      "accent": "#74D6AA",
+      "accent2": "#2C6E8F",
+      "glyph": "K",
+      "order": 60
+    }
+  }
 }
