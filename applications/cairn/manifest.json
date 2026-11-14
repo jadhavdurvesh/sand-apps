@@ -15,5 +15,11 @@
     "platform.window.create",
     "platform.notifications.create",
     "platform.desktop.events"
-  ]
+  ],
+  "native": {
+    "status": "windowed-v1",
+    "source": "native/main.c",
+    "abi": 4,
+    "note": "Native CAIRN window (60x20 terminal, sandsh command set) on the SAND OS window service: open cairn. The full 0.7 command registry remains a host prototype."
+  }
 }
