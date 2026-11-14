@@ -19,6 +19,14 @@
     "status": "windowed-v1",
     "source": "native/main.c",
     "abi": 3,
-    "note": "Runs on SAND OS through the kernel window service (open chronos)."
+    "note": "Runs on SAND OS through the kernel window service (open chronos).",
+    "launcher": {
+      "label": "CHRONOS",
+      "subtitle": "Stopwatch",
+      "accent": "#B48CFF",
+      "accent2": "#5A3AA0",
+      "glyph": "C",
+      "order": 40
+    }
   }
 }
