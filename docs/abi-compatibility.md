@@ -26,7 +26,7 @@ A segment uses <6I8s: virtual address, memory size, file offset, file size, perm
 
 A relocation uses <3I: target virtual address, type, addend. Only ABS32 is accepted.
 
-## SAND OS syscall ABI v3 (implemented in sand-os)
+## SAND OS syscall ABI v4 (implemented in sand-os)
 
 Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, EDX; the result is returned in EAX (negative = error). The headers in `sdk/native/include/sand/` are copies of the kernel's `sdk/sapp/include/sand/abi.h` and friends; **sand-os remains the source of truth** and these copies must be refreshed when the ABI changes.
 
@@ -45,15 +45,17 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 18 | WIN_CREATE | `win_create(title, (w<<16)|h)` -> window id; surface 200-520 x 120-380, 3 windows system-wide |
 | 19 | WIN_DRAW | `win_draw(id, sand_draw*, count<=64)`: batched draw commands rendered by the kernel in the SAND typeface and shape renderer |
 | 20 | WIN_EVENT | `win_event(id, sand_event*)` -> 1 event / 0 none / <0 window gone (key, mouse down/up/move in surface coordinates) |
-| 21 | WIN_CLOSE | destroy the window |
+| 21 | WIN_CLOSE | close the window (it fades out; further calls on it return NOENT) |
+| 22 | WIN_BLIT | `win_blit(id, sand_blit*)`: copy an app-owned 0x00RRGGBB pixel buffer into the surface, optional 1-4x integer upscale (a SAPP image is limited to 64 pages, so upscaling lets small buffers fill a window) |
+| 23 | WIN_RESIZABLE | `win_resizable(id, (min_w<<16)|min_h)`: opt in to user resizing; the app then receives `SAND_EV_RESIZE` (x,y = new client size, surface cleared) and must redraw |
 
 Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
 
-Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall. A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no resizable windows, app-owned pixel surfaces, networking or per-app permission enforcement (window creation is not yet permission-gated). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
+Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall. A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking or per-app permission enforcement (window creation is not yet permission-gated). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
 
 ## Known kernel limitations
 
-Superseded detail: older kernels accepted only syscall 1. Current sand-os has the v2 development ABI above (console, files, processes, introspection). Still missing: a stable ABI, resizable windows and shared pixel buffers, networking, device access and permission enforcement. The desktop shell (SAND Dusk) now provides the window service above.
+Superseded detail: older kernels accepted only syscall 1. Current sand-os has the v2 development ABI above (console, files, processes, introspection). Still missing: a stable ABI, shared (zero-copy) pixel buffers, networking, device access and permission enforcement. The desktop shell (SAND Dusk) now provides the window service above.
 
 This SDK currently builds and validates executable packages; it does not claim that ordinary applications can interact with the OS yet. ABI additions must be made in sand-os first, then documented and versioned here.
 
