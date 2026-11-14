@@ -20,6 +20,14 @@
     "status": "windowed-v1",
     "source": "native/main.c",
     "abi": 3,
-    "note": "Runs on SAND OS through the kernel window service (open quanta)."
+    "note": "Runs on SAND OS through the kernel window service (open quanta).",
+    "launcher": {
+      "label": "QUANTA",
+      "subtitle": "Calculator",
+      "accent": "#E8836B",
+      "accent2": "#9C3E5A",
+      "glyph": "Q",
+      "order": 30
+    }
   }
 }
