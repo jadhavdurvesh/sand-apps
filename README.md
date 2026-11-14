@@ -53,7 +53,7 @@ The native smoke-test produces `build/hello.elf` and `build/hello.sapp`.
 
 ## Native apps on SAND OS
 
-**LOCUS** now has a native, windowed build (`applications/locus/native/`) that runs on SAND OS through the kernel window service (`run locus` in the shell): browse, preview, create and delete SANDFS files with mouse or keyboard. A console variant lives in `native-console/`. Both target the v3 development ABI in `sdk/native/`. The other apps remain host-side prototypes; porting them to the window service is the next step. See [docs/abi-compatibility.md](docs/abi-compatibility.md).
+**LOCUS** now has a native, windowed build (`applications/locus/native/`) that runs on SAND OS through the kernel window service (`run locus` in the shell): browse, preview, create and delete SANDFS files with mouse or keyboard. A console variant lives in `native-console/`. **QUANTA** (calculator) and **CHRONOS** (stopwatch) also have windowed native builds under `applications/<id>/native/`; start them from the SAND dock launcher or with `open <app>` in the SAND shell. Both target the v3 development ABI in `sdk/native/`. The remaining apps stay host-side prototypes until ported to the window service. See [docs/abi-compatibility.md](docs/abi-compatibility.md).
 
 ## ABI boundary
 

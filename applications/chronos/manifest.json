@@ -14,5 +14,11 @@
     "storage.write",
     "platform.notifications.create",
     "platform.window.create"
-  ]
+  ],
+  "native": {
+    "status": "windowed-v1",
+    "source": "native/main.c",
+    "abi": 3,
+    "note": "Runs on SAND OS through the kernel window service (open chronos)."
+  }
 }
