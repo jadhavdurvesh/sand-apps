@@ -15,5 +15,11 @@
     "platform.window.create",
     "platform.notifications.create",
     "platform.desktop.events"
-  ]
+  ],
+  "native": {
+    "status": "windowed-v1",
+    "source": "native/main.c",
+    "abi": 3,
+    "note": "Runs on SAND OS through the kernel window service (open quanta)."
+  }
 }
