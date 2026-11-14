@@ -53,11 +53,11 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 
 Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
 
-Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall. A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking or per-app permission enforcement (window creation is not yet permission-gated). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
+Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall, `-5` permission denied (the app's manifest does not grant the capability). A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking. Manifest `permissions` are enforced by the kernel for the built-in apps: `console.read/write/rw`, `fs.read/write/rw`, `process.spawn`, `window.create` and `settings.write` gate the matching syscalls (see sand-os docs/ARCHITECTURE.md). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
 
 ## Known kernel limitations
 
-Superseded detail: older kernels accepted only syscall 1. Current sand-os has the v2 development ABI above (console, files, processes, introspection). Still missing: a stable ABI, shared (zero-copy) pixel buffers, networking, device access and permission enforcement. The desktop shell (SAND Dusk) now provides the window service above.
+Superseded detail: older kernels accepted only syscall 1. Current sand-os has the v2 development ABI above (console, files, processes, introspection). Still missing: a stable ABI, shared (zero-copy) pixel buffers, networking, device access. Permission enforcement exists for built-in apps (see above). The desktop shell (SAND Dusk) now provides the window service above.
 
 This SDK currently builds and validates executable packages; it does not claim that ordinary applications can interact with the OS yet. ABI additions must be made in sand-os first, then documented and versioned here.
 
