@@ -20,6 +20,14 @@
     "status": "windowed-v1",
     "source": "native/main.c",
     "abi": 4,
-    "note": "Native CAIRN window (60x20 terminal, sandsh command set) on the SAND OS window service: open cairn. The full 0.7 command registry remains a host prototype."
+    "note": "Native CAIRN window (60x20 terminal, sandsh command set) on the SAND OS window service: open cairn. The full 0.7 command registry remains a host prototype.",
+    "launcher": {
+      "label": "CAIRN",
+      "subtitle": "Terminal",
+      "accent": "#B9A6FF",
+      "accent2": "#4B3C9A",
+      "glyph": ">",
+      "order": 10
+    }
   }
 }

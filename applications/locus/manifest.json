@@ -23,6 +23,14 @@
     "source": "native/main.c",
     "console_source": "native-console/main.c",
     "abi": 3,
-    "note": "Runs on SAND OS today through the kernel window service (run locus). A console variant is kept for serial sessions."
+    "note": "Runs on SAND OS today through the kernel window service (run locus). A console variant is kept for serial sessions.",
+    "launcher": {
+      "label": "LOCUS",
+      "subtitle": "Files",
+      "accent": "#5CD6A0",
+      "accent2": "#1E7A66",
+      "glyph": "L",
+      "order": 20
+    }
   }
 }

@@ -66,3 +66,7 @@ This SDK currently builds and validates executable packages; it does not claim t
 - Reject unsupported ELF layouts rather than generating packages the kernel rejects.
 - Keep host-side build tools separate from the target OS runtime.
 - Add tests for every accepted and rejected package condition.
+
+## Native launcher entry (`native.launcher`)
+
+SAND OS builds its dock launcher from app manifests (`tools/gen_app_table.py` in sand-os). The `native.launcher` object here mirrors the entry in sand-os `apps/<name>/manifest.json` (`launcher`): `label` (<=15 ASCII chars), `subtitle` (<=23), `accent` and `accent2` (`#RRGGBB` gradient for the icon tile), `glyph` (one printable ASCII char) and `order`. An app without it is not shown in the launcher; at most 9 apps are listed. The generator fails the build on any malformed value.
