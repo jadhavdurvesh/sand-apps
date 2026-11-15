@@ -26,7 +26,7 @@ A segment uses <6I8s: virtual address, memory size, file offset, file size, perm
 
 A relocation uses <3I: target virtual address, type, addend. Only ABS32 is accepted.
 
-## SAND OS syscall ABI v5 (implemented in sand-os)
+## SAND OS syscall ABI v6 (implemented in sand-os)
 
 Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, EDX; the result is returned in EAX (negative = error). The headers in `sdk/native/include/sand/` are copies of the kernel's `sdk/sapp/include/sand/abi.h` and friends; **sand-os remains the source of truth** and these copies must be refreshed when the ABI changes.
 
@@ -50,10 +50,12 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 23 | WIN_RESIZABLE | `win_resizable(id, (min_w<<16)|min_h)`: opt in to user resizing; the app then receives `SAND_EV_RESIZE` (x,y = new client size, surface cleared) and must redraw |
 | 24 | SETTING_GET | `setting_get(key)`: read a system setting (`SAND_SET_ACCENT` 1 = palette 0-4, `SAND_SET_REDUCED_MOTION` 2, `SAND_SET_CLOCK_24H` 3) |
 | 25 | SETTING_SET | `setting_set(key, value)`: range-checked write; the desktop repaints and the kernel persists the table to `system.cfg` in SANDFS |
+| 26 | INSTALL_PUT | `install_put(offset, data, len<=512)`: stage an app image (append-only; offset 0 starts a new one); needs `system.install` |
+| 27 | INSTALL_COMMIT | `install_commit(name)`: gate-check the staged SAPP and store it as `<name>.sapp` in SANDFS; refuses built-in names and non-SAPP data; needs `system.install` |
 
 Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
 
-Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall, `-5` permission denied (the app's manifest does not grant the capability). A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking. Manifest `permissions` are enforced by the kernel for the built-in apps: `console.read/write/rw`, `fs.read/write/rw`, `process.spawn`, `window.create` and `settings.write` gate the matching syscalls (see sand-os docs/ARCHITECTURE.md). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
+Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall, `-5` permission denied (the app's manifest does not grant the capability). A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking. Manifest `permissions` are enforced by the kernel for the built-in apps: `console.read/write/rw`, `fs.read/write/rw`, `process.spawn`, `window.create` and `settings.write` and `system.install` gate the matching syscalls (see sand-os docs/ARCHITECTURE.md). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
 
 ## Known kernel limitations
 
