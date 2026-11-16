@@ -26,7 +26,7 @@ A segment uses <6I8s: virtual address, memory size, file offset, file size, perm
 
 A relocation uses <3I: target virtual address, type, addend. Only ABS32 is accepted.
 
-## SAND OS syscall ABI v6 (implemented in sand-os)
+## SAND OS syscall ABI v7 (implemented in sand-os)
 
 Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, EDX; the result is returned in EAX (negative = error). The headers in `sdk/native/include/sand/` are copies of the kernel's `sdk/sapp/include/sand/abi.h` and friends; **sand-os remains the source of truth** and these copies must be refreshed when the ABI changes.
 
@@ -52,6 +52,7 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 25 | SETTING_SET | `setting_set(key, value)`: range-checked write; the desktop repaints and the kernel persists the table to `system.cfg` in SANDFS |
 | 26 | INSTALL_PUT | `install_put(offset, data, len<=512)`: stage an app image (append-only; offset 0 starts a new one); needs `system.install` |
 | 27 | INSTALL_COMMIT | `install_commit(name)`: gate-check the staged SAPP and store it as `<name>.sapp` in SANDFS; refuses built-in names and non-SAPP data; needs `system.install` |
+| 28 | TIME_GET | `time_get(struct sand_time*)`: the machine's real-time clock (year, month, day, hour, minute, second; UTC as set by firmware, not synchronised); read-only, no permission needed |
 
 Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
 
