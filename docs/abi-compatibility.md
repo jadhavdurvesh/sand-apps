@@ -26,7 +26,7 @@ A segment uses <6I8s: virtual address, memory size, file offset, file size, perm
 
 A relocation uses <3I: target virtual address, type, addend. Only ABS32 is accepted.
 
-## SAND OS syscall ABI v7 (implemented in sand-os)
+## SAND OS syscall ABI v8 (implemented in sand-os)
 
 Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, EDX; the result is returned in EAX (negative = error). The headers in `sdk/native/include/sand/` are copies of the kernel's `sdk/sapp/include/sand/abi.h` and friends; **sand-os remains the source of truth** and these copies must be refreshed when the ABI changes.
 
@@ -53,10 +53,13 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 26 | INSTALL_PUT | `install_put(offset, data, len<=512)`: stage an app image (append-only; offset 0 starts a new one); needs `system.install` |
 | 27 | INSTALL_COMMIT | `install_commit(name)`: gate-check the staged SAPP and store it as `<name>.sapp` in SANDFS; refuses built-in names and non-SAPP data; needs `system.install` |
 | 28 | TIME_GET | `time_get(struct sand_time*)`: the machine's real-time clock (year, month, day, hour, minute, second; UTC as set by firmware, not synchronised); read-only, no permission needed |
+| 29 | CHAN_OPEN | `chan_open(name)`: open or create a TIDEWAY channel (`[a-z0-9._-]`, ≤15 chars); needs `ipc.channel` |
+| 30 | CHAN_SEND | `chan_send(handle, data, 1..112)`: queue a message; `-6` (SAND_E_FULL) when 8 are waiting |
+| 31 | CHAN_RECV | `chan_recv(handle, sand_chan_msg*)`: 1 = a message (oldest first, `.from` = kernel-stamped sender pid), 0 = none |
 
 Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
 
-Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall, `-5` permission denied (the app's manifest does not grant the capability). A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking. Manifest `permissions` are enforced by the kernel for the built-in apps: `console.read/write/rw`, `fs.read/write/rw`, `process.spawn`, `window.create` and `settings.write` and `system.install` gate the matching syscalls (see sand-os docs/ARCHITECTURE.md). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
+Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall, `-6` bounded table/queue full, `-5` permission denied (the app's manifest does not grant the capability). A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking. Manifest `permissions` are enforced by the kernel for the built-in apps: `console.read/write/rw`, `fs.read/write/rw`, `process.spawn`, `window.create` and `settings.write`, `system.install` and `ipc.channel` gate the matching syscalls (see sand-os docs/ARCHITECTURE.md). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
 
 ## Known kernel limitations
 
