@@ -26,7 +26,7 @@ A segment uses <6I8s: virtual address, memory size, file offset, file size, perm
 
 A relocation uses <3I: target virtual address, type, addend. Only ABS32 is accepted.
 
-## SAND OS syscall ABI v9 (implemented in sand-os)
+## SAND OS syscall ABI v10 (implemented in sand-os)
 
 Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, EDX; the result is returned in EAX (negative = error). The headers in `sdk/native/include/sand/` are copies of the kernel's `sdk/sapp/include/sand/abi.h` and friends; **sand-os remains the source of truth** and these copies must be refreshed when the ABI changes.
 
@@ -56,15 +56,19 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 29 | CHAN_OPEN | `chan_open(name)`: open or create a TIDEWAY channel (`[a-z0-9._-]`, ≤15 chars); needs `ipc.channel` |
 | 30 | CHAN_SEND | `chan_send(handle, data, 1..112)`: queue a message; `-6` (SAND_E_FULL) when 8 are waiting |
 | 31 | CHAN_RECV | `chan_recv(handle, sand_chan_msg*)`: 1 = a message (oldest first, `.from` = kernel-stamped sender pid), 0 = none |
-| 32 | NET_INFO | `net_info(sand_netinfo*)`: MAC, IP, gateway, frame counters; needs `net.access`; `-8` without a NIC |
+| 32 | NET_INFO | `net_info(sand_netinfo*)`: MAC, IP, netmask, gateway, frame counters, flags (bit 0 = address from DHCP); needs `net.access`; `-8` without a NIC |
 | 33 | NET_PING | `net_ping(ip, timeout_ms)`: ICMP echo, returns round trip in ms, `-7` on timeout; audited |
 | 34 | NET_UDP_SEND | `net_udp_send(sand_udp*)`: one datagram up to 512 bytes; audited with destination |
 | 35 | NET_UDP_RECV | `net_udp_recv(port, sand_udp*)`: 1 datagram, 0 none; the first call binds the port (4 sockets) |
 | 36 | VEYRA_QUERY | `veyra_query(id, sand_veyra_subsystem_abi*)`: versioned Veyra subsystem descriptor (FILES 0x0101, IPC 0x0102, NOTIFY 0x0103, NET 0x0104; id 0 = count); open to every app; `-8` if absent |
+| 37 | TCP_CONNECT | `tcp_connect(ip, port, timeout_ms)`: client connect (blocks); one connection system-wide; `-7` timeout, `-9` refused; audited |
+| 38 | TCP_SEND | `tcp_send(data, 1..512)`: one segment, returns once the peer ACKed it (stop-and-wait) |
+| 39 | TCP_RECV | `tcp_recv(buf, cap)`: bytes received, 0 nothing yet (non-blocking), `-9` when the peer closed and nothing is left |
+| 40 | TCP_CLOSE | `tcp_close()`: send FIN and release the connection |
 
 Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
 
-Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall, `-8` no such device, `-7` timeout, `-6` bounded table/queue full, `-5` permission denied (the app's manifest does not grant the capability). A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking. Manifest `permissions` are enforced by the kernel for the built-in apps: `console.read/write/rw`, `fs.read/write/rw`, `process.spawn`, `window.create` and `settings.write`, `system.install` and `ipc.channel` and `net.access` gate the matching syscalls (see sand-os docs/ARCHITECTURE.md). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
+Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall, `-9` connection closed/refused, `-8` no such device, `-7` timeout, `-6` bounded table/queue full, `-5` permission denied (the app's manifest does not grant the capability). A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking. Manifest `permissions` are enforced by the kernel for the built-in apps: `console.read/write/rw`, `fs.read/write/rw`, `process.spawn`, `window.create` and `settings.write`, `system.install` and `ipc.channel` and `net.access` gate the matching syscalls (see sand-os docs/ARCHITECTURE.md). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
 
 ## Known kernel limitations
 
