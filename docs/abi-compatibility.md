@@ -26,7 +26,7 @@ A segment uses <6I8s: virtual address, memory size, file offset, file size, perm
 
 A relocation uses <3I: target virtual address, type, addend. Only ABS32 is accepted.
 
-## SAND OS syscall ABI v10 (implemented in sand-os)
+## SAND OS syscall ABI v11 (implemented in sand-os)
 
 Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, EDX; the result is returned in EAX (negative = error). The headers in `sdk/native/include/sand/` are copies of the kernel's `sdk/sapp/include/sand/abi.h` and friends; **sand-os remains the source of truth** and these copies must be refreshed when the ABI changes.
 
@@ -65,6 +65,7 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 38 | TCP_SEND | `tcp_send(data, 1..512)`: one segment, returns once the peer ACKed it (stop-and-wait) |
 | 39 | TCP_RECV | `tcp_recv(buf, cap)`: bytes received, 0 nothing yet (non-blocking), `-9` when the peer closed and nothing is left |
 | 40 | TCP_CLOSE | `tcp_close()`: send FIN and release the connection |
+| 41 | NAME_RESOLVE | `name_resolve(sand_resolve*)`: HUGINN DNS A-record lookup (blocks up to 4 s); server 0 = DHCP/default resolver, port 0 = 53; `-8` no such name, `-7` timeout; audited; needs `net.access`. Veyra id `0x0105` |
 
 Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
 
