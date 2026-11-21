@@ -39,7 +39,7 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 5 | YIELD | give up the CPU |
 | 6 | SLEEP_MS | sleep (scheduler-blocked) |
 | 7 | READ | blocking console read |
-| 8–11 | FS_READ / FS_WRITE / FS_LIST / FS_REMOVE | MIMIR files (whole files up to 64 KiB; `-5` when the file's Veyra label denies the caller, `-10` when a stored hash no longer matches) |
+| 8–11 | FS_READ / FS_WRITE / FS_LIST / FS_REMOVE | MIMIR files (whole files up to 256 KiB; `-5` when the file's Veyra label denies the caller, `-10` when a stored hash no longer matches) |
 | 12–13 | SPAWN / WAIT | start an embedded app by name; wait for its exit status |
 | 14–17 | SYSINFO / PROC_LIST / APP_LIST / DEVICE_LIST | system introspection |
 | 18 | WIN_CREATE | `win_create(title, (w<<16)|h)` -> window id; surface 200-520 x 120-380, 3 windows system-wide |
