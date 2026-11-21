@@ -26,7 +26,7 @@ A segment uses <6I8s: virtual address, memory size, file offset, file size, perm
 
 A relocation uses <3I: target virtual address, type, addend. Only ABS32 is accepted.
 
-## SAND OS syscall ABI v11 (implemented in sand-os)
+## SAND OS syscall ABI v12 (implemented in sand-os)
 
 Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, EDX; the result is returned in EAX (negative = error). The headers in `sdk/native/include/sand/` are copies of the kernel's `sdk/sapp/include/sand/abi.h` and friends; **sand-os remains the source of truth** and these copies must be refreshed when the ABI changes.
 
@@ -39,7 +39,7 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 5 | YIELD | give up the CPU |
 | 6 | SLEEP_MS | sleep (scheduler-blocked) |
 | 7 | READ | blocking console read |
-| 8–11 | FS_READ / FS_WRITE / FS_LIST / FS_REMOVE | SANDFS v1 files |
+| 8–11 | FS_READ / FS_WRITE / FS_LIST / FS_REMOVE | MIMIR files (whole files up to 64 KiB; `-5` when the file's Veyra label denies the caller, `-10` when a stored hash no longer matches) |
 | 12–13 | SPAWN / WAIT | start an embedded app by name; wait for its exit status |
 | 14–17 | SYSINFO / PROC_LIST / APP_LIST / DEVICE_LIST | system introspection |
 | 18 | WIN_CREATE | `win_create(title, (w<<16)|h)` -> window id; surface 200-520 x 120-380, 3 windows system-wide |
@@ -49,9 +49,9 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 22 | WIN_BLIT | `win_blit(id, sand_blit*)`: copy an app-owned 0x00RRGGBB pixel buffer into the surface, optional 1-4x integer upscale (a SAPP image is limited to 64 pages, so upscaling lets small buffers fill a window) |
 | 23 | WIN_RESIZABLE | `win_resizable(id, (min_w<<16)|min_h)`: opt in to user resizing; the app then receives `SAND_EV_RESIZE` (x,y = new client size, surface cleared) and must redraw |
 | 24 | SETTING_GET | `setting_get(key)`: read a system setting (`SAND_SET_ACCENT` 1 = palette 0-4, `SAND_SET_REDUCED_MOTION` 2, `SAND_SET_CLOCK_24H` 3) |
-| 25 | SETTING_SET | `setting_set(key, value)`: range-checked write; the desktop repaints and the kernel persists the table to `system.cfg` in SANDFS |
+| 25 | SETTING_SET | `setting_set(key, value)`: range-checked write; the desktop repaints and the kernel persists the table to `system.cfg` in MIMIR |
 | 26 | INSTALL_PUT | `install_put(offset, data, len<=512)`: stage an app image (append-only; offset 0 starts a new one); needs `system.install` |
-| 27 | INSTALL_COMMIT | `install_commit(name)`: gate-check the staged SAPP and store it as `<name>.sapp` in SANDFS; refuses built-in names and non-SAPP data; needs `system.install` |
+| 27 | INSTALL_COMMIT | `install_commit(name)`: gate-check the staged SAPP and store it as `<name>.sapp` in MIMIR; refuses built-in names and non-SAPP data; needs `system.install` |
 | 28 | TIME_GET | `time_get(struct sand_time*)`: the machine's real-time clock (year, month, day, hour, minute, second; UTC as set by firmware, not synchronised); read-only, no permission needed |
 | 29 | CHAN_OPEN | `chan_open(name)`: open or create a TIDEWAY channel (`[a-z0-9._-]`, ≤15 chars); needs `ipc.channel` |
 | 30 | CHAN_SEND | `chan_send(handle, data, 1..112)`: queue a message; `-6` (SAND_E_FULL) when 8 are waiting |
@@ -66,10 +66,17 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 39 | TCP_RECV | `tcp_recv(buf, cap)`: bytes received, 0 nothing yet (non-blocking), `-9` when the peer closed and nothing is left |
 | 40 | TCP_CLOSE | `tcp_close()`: send FIN and release the connection |
 | 41 | NAME_RESOLVE | `name_resolve(sand_resolve*)`: HUGINN DNS A-record lookup (blocks up to 4 s); server 0 = DHCP/default resolver, port 0 = 53; `-8` no such name, `-7` timeout; audited; needs `net.access`. Veyra id `0x0105` |
+| 42 | FS_STAT | `fs_stat(name, sand_fsstat*)`: size, version, read/write labels, chunk count, newest-version id (SHA-256) |
+| 43 | FS_HISTORY | `fs_history(name, index, sand_fsver*)`: versions newest first (index 0 = newest); `-3` past the oldest kept version |
+| 44 | FS_ROLLBACK | `fs_rollback(name, version)`: appends a new version with the old content (history is never rewritten); obeys the write label; needs `fs.write` |
+| 45 | FS_SEAL | `fs_seal(sand_fsseal*)`: generation, tide, epoch, blocks used, files, versions and the hash-chain head |
+| 46 | FS_SCRUB | `fs_scrub(sand_fsscrub*)`: rechecks every stored block and the chain; reports the damaged-block count |
+| 47 | FS_LABEL | `fs_label(name, read_perm, write_perm)`: set the Veyra labels (`SAND_PERM_*` masks a caller must hold); needs `system.install` |
+| 48 | FS_EBB | `fs_ebb()`: copy the live files into the other tide (frees space, drops old history); needs `fs.write` |
 
 Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
 
-Errors: `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall, `-9` connection closed/refused, `-8` no such device, `-7` timeout, `-6` bounded table/queue full, `-5` permission denied (the app's manifest does not grant the capability). A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking. Manifest `permissions` are enforced by the kernel for the built-in apps: `console.read/write/rw`, `fs.read/write/rw`, `process.spawn`, `window.create` and `settings.write`, `system.install` and `ipc.channel` and `net.access` gate the matching syscalls (see sand-os docs/ARCHITECTURE.md). Apps are currently embedded in the kernel image; loading from SANDFS and SAPP v2 signature enforcement are future work.
+Errors: `-10` stored data failed its MIMIR hash check, `-1` fail, `-2` bad user pointer, `-3` not found, `-4` no such syscall, `-9` connection closed/refused, `-8` no such device, `-7` timeout, `-6` bounded table/queue full, `-5` permission denied (the app's manifest does not grant the capability). A ring-3 fault ends the process with status `-256 - vector`. User pointers are range-validated by the kernel. The ABI is a **development ABI**: not frozen, and still no networking. Manifest `permissions` are enforced by the kernel for the built-in apps: `console.read/write/rw`, `fs.read/write/rw`, `process.spawn`, `window.create` and `settings.write`, `system.install` and `ipc.channel` and `net.access` gate the matching syscalls (see sand-os docs/ARCHITECTURE.md). Apps are currently embedded in the kernel image; loading from MIMIR and SAPP v2 signature enforcement are future work.
 
 ## Known kernel limitations
 
