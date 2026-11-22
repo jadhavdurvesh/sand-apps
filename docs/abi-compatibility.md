@@ -96,3 +96,7 @@ This SDK currently builds and validates executable packages; it does not claim t
 ## Native launcher entry (`native.launcher`)
 
 SAND OS builds its dock launcher from app manifests (`tools/gen_app_table.py` in sand-os). The `native.launcher` object here mirrors the entry in sand-os `apps/<name>/manifest.json` (`launcher`): `label` (<=15 ASCII chars), `subtitle` (<=23), `accent` and `accent2` (`#RRGGBB` gradient for the icon tile), `glyph` (one printable ASCII char) and `order`. An app without it is not shown in the launcher; at most 9 apps are listed. The generator fails the build on any malformed value.
+
+### RUNELIB (`sdk/native/include/sand/rune.h`)
+
+Header-only convenience layer over syscalls 42-49 (versions, undo, byte-compare, branch walk, scrub). It adds no privilege; the kernel still checks permissions, labels and wards. Same file as `sdk/sapp/include/sand/rune.h` in sand-os, which tests it in QEMU (`apps/runetest`).
