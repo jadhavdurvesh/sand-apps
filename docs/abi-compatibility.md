@@ -66,10 +66,10 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 39 | TCP_RECV | `tcp_recv(buf, cap)`: bytes received, 0 nothing yet (non-blocking), `-9` when the peer closed and nothing is left |
 | 40 | TCP_CLOSE | `tcp_close()`: send FIN and release the connection |
 | 41 | NAME_RESOLVE | `name_resolve(sand_resolve*)`: HUGINN DNS A-record lookup (blocks up to 4 s); server 0 = DHCP/default resolver, port 0 = 53; `-8` no such name, `-7` timeout; audited; needs `net.access`. Veyra id `0x0105` |
-| 42 | FS_STAT | `fs_stat(name, sand_fsstat*)`: size, version, read/write labels, chunk count, newest-version id (SHA-256) |
+| 42 | FS_STAT | `fs_stat(name, sand_fsstat*)`: size, version, read/write labels, chunk count, newest-version id (SHA-256); `flags` 2 = unchanged since the signed factory manifest, 4 = listed there but changed |
 | 43 | FS_HISTORY | `fs_history(name, index, sand_fsver*)`: versions newest first (index 0 = newest); `-3` past the oldest kept version |
 | 44 | FS_ROLLBACK | `fs_rollback(name, version)`: appends a new version with the old content (history is never rewritten); obeys the write label; needs `fs.write` |
-| 45 | FS_SEAL | `fs_seal(sand_fsseal*)`: generation, tide, epoch, blocks used, files, versions and the hash-chain head |
+| 45 | FS_SEAL | `fs_seal(sand_fsseal*)`: generation, tide, epoch, blocks used, files, versions, the hash-chain head and `sigil` (0 none, 1 signed factory manifest valid, 2 invalid) |
 | 46 | FS_SCRUB | `fs_scrub(sand_fsscrub*)`: rechecks every stored block and the chain; reports the damaged-block count |
 | 47 | FS_LABEL | `fs_label(name, read_perm, write_perm)`: set the Veyra labels (`SAND_PERM_*` masks a caller must hold); needs `system.install` |
 | 48 | FS_EBB | `fs_ebb()`: copy the live files into the other tide (frees space, drops old history); needs `fs.write` |
