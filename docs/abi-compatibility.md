@@ -26,7 +26,7 @@ A segment uses <6I8s: virtual address, memory size, file offset, file size, perm
 
 A relocation uses <3I: target virtual address, type, addend. Only ABS32 is accepted.
 
-## SAND OS syscall ABI v12 (implemented in sand-os)
+## SAND OS syscall ABI v13 (implemented in sand-os)
 
 Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, EDX; the result is returned in EAX (negative = error). The headers in `sdk/native/include/sand/` are copies of the kernel's `sdk/sapp/include/sand/abi.h` and friends; **sand-os remains the source of truth** and these copies must be refreshed when the ABI changes.
 
@@ -72,6 +72,7 @@ Applications call `int 0x80` with the number in EAX and arguments in EBX, ECX, E
 | 45 | FS_SEAL | `fs_seal(sand_fsseal*)`: generation, tide, epoch, blocks used, files, versions, the hash-chain head and `sigil` (0 none, 1 signed factory manifest valid, 2 invalid) |
 | 46 | FS_SCRUB | `fs_scrub(sand_fsscrub*)`: rechecks every stored block and the chain; reports the damaged-block count |
 | 47 | FS_LABEL | `fs_label(name, read_perm, write_perm)`: set the Veyra labels (`SAND_PERM_*` masks a caller must hold); needs `system.install` |
+| 49 | FS_LIST_EX | `fs_list_ex(index, sand_dirent_ex*)`: like FS_LIST but with 48-byte names (MIMIR names may be up to 47 characters; `/` makes branches). FS_LIST keeps its 24-byte buffer and skips longer names, so binaries built for older ABIs stay safe; new code should use FS_LIST_EX |
 | 48 | FS_EBB | `fs_ebb()`: copy the live files into the other tide (frees space, drops old history); needs `fs.write` |
 
 Shell: `run <app>` launches and waits; `open <app>` launches in the background so several windows can coexist (up to 3 app windows).
